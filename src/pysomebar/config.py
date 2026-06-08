@@ -22,14 +22,29 @@ class ModuleConfig(BaseModel):
 
 
 class DateModuleConfig(ModuleConfig):
-    format: str
+    """Config for the date/time module.
+
+    Attributes
+    ----------
+    format : str, default "%d/%m/%Y %H:%M"
+        Format to pass to strftime.
+
+    """
+
+    format: str = "%d/%m/%Y %H:%M"
 
 
 class Config(BaseModel):
-    date: DateModuleConfig
+    """Top-level config."""
+
+    date: DateModuleConfig = DateModuleConfig()
 
 
-with Path(CONFIG_FILE).open("rb") as f:
-    data = tomllib.load(f)
+try:
+    with Path(CONFIG_FILE).open("rb") as f:
+        data = tomllib.load(f)
 
-CONFIG = Config(**data)
+    CONFIG = Config(**data)
+
+except FileNotFoundError:
+    CONFIG = Config()
