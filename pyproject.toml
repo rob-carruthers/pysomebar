@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Status updater for somebar."
 readme = "README.md"
 requires-python = ">=3.14"
-dependencies = []
+dependencies = ["pydantic"]
 
 [project.scripts]
 pysomebar = "pysomebar:main"
