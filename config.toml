@@ -1,2 +1,3 @@
 [date]
+enabled = true
 format = "%d/%m/%Y %H:%M"

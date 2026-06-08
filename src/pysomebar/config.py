@@ -1,3 +1,5 @@
+"""Configuration."""
+
 import tomllib
 from pathlib import Path
 
@@ -7,6 +9,15 @@ CONFIG_FILE = "./config.toml"
 
 
 class ModuleConfig(BaseModel):
+    """Config for a module.
+
+    Attributes
+    ----------
+    enabled : bool, default False
+        Whether a module should be enabled.
+
+    """
+
     enabled: bool = False
 
 
