@@ -2,7 +2,7 @@
 
 import asyncio
 import os
-import random
+import time
 from pathlib import Path
 
 import aiofiles
@@ -14,10 +14,14 @@ RETRIES = 10
 
 
 class SomebarUpdater:
-    def __init__(self, separator: str = " | "):
+    """Orchestrator for updater.
+
+    Contains Modules and handles writing to output.
+    """
+
+    def __init__(self, separator: str = " | ") -> None:  # noqa: D107
         self.separator = separator
         self._modules: list[Module] = []
-        self.modules: list[Module] = []
         self.output: str = ""
         self.last_output: str = ""
         self.update_event = asyncio.Event()
@@ -72,10 +76,11 @@ async def main_loop() -> None:
     await updater.loop()
 
 
-def main() -> None:
+def main() -> None:  # noqa: D103
     for _ in range(RETRIES):
         if SOMEBAR.exists():
             break
+        time.sleep(0.5)
     else:
         raise FileNotFoundError
 
