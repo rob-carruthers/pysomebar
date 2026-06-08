@@ -38,7 +38,9 @@ class Module(ABC):
 
 
 class DateModule(Module):
-    def __init__(self, interval: int):
+    """Module for printing date/time."""
+
+    def __init__(self, interval: int) -> None:  # noqa: D107
         super().__init__(interval)
 
         self.enabled = CONFIG.date.enabled
