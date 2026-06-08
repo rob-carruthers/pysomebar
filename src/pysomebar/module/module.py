@@ -1,14 +1,12 @@
 """Modules for pysomebar."""
 
 import asyncio
-import datetime
+import random
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from .config import CONFIG
-
 if TYPE_CHECKING:
-    from . import SomebarUpdater
+    from pysomebar import SomebarUpdater
 
 
 class Module(ABC):
@@ -26,6 +24,7 @@ class Module(ABC):
         ...
 
     async def loop(self) -> None:
+        """Loop over interval/async updates."""
         if not self.enabled:
             return
 
@@ -37,20 +36,14 @@ class Module(ABC):
             await asyncio.sleep(self.interval)
 
 
-class DateModule(Module):
-    """Module for printing date/time."""
-
-    def __init__(self, interval: int) -> None:  # noqa: D107
+class RandomModule(Module):
+    def __init__(self, interval: int):
         super().__init__(interval)
 
-        self.enabled = CONFIG.date.enabled
-
     async def update(self) -> None:
-        """Update output with current date/time in chosen format."""
         if not self.enabled:
             return
 
-        now = datetime.datetime.now().astimezone().strftime(CONFIG.date.format)
-        self.output = now
+        self.output = str(random.randint(0, 10))
         if self.updater is not None:
             self.updater.update_event.set()

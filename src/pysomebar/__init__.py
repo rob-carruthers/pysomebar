@@ -6,7 +6,8 @@ import time
 from pathlib import Path
 
 import aiofiles
-from .module import DateModule, Module
+
+from .module import DateModule, Module, RandomModule
 
 XDG_RUNTIME_DIR = os.environ["XDG_RUNTIME_DIR"]
 SOMEBAR = Path(XDG_RUNTIME_DIR) / "somebar-0"
