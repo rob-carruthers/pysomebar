@@ -1,7 +1,6 @@
 """Modules for pysomebar."""
 
 import asyncio
-import random
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -34,16 +33,3 @@ class Module(ABC):
             except asyncio.TimeoutError:  # noqa: UP041
                 continue
             await asyncio.sleep(self.interval)
-
-
-class RandomModule(Module):
-    def __init__(self, interval: int):
-        super().__init__(interval)
-
-    async def update(self) -> None:
-        if not self.enabled:
-            return
-
-        self.output = str(random.randint(0, 10))
-        if self.updater is not None:
-            self.updater.update_event.set()

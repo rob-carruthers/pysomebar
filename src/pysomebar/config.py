@@ -21,6 +21,10 @@ class ModuleConfig(BaseModel):
     enabled: bool = False
 
 
+class BatteryModuleConfig(ModuleConfig):
+    """Config for battery module."""
+
+
 class DateModuleConfig(ModuleConfig):
     """Config for the date/time module.
 
@@ -37,6 +41,7 @@ class DateModuleConfig(ModuleConfig):
 class Config(BaseModel):
     """Top-level config."""
 
+    battery: BatteryModuleConfig = BatteryModuleConfig()
     date: DateModuleConfig = DateModuleConfig()
 
 

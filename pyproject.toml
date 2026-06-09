@@ -4,7 +4,11 @@ version = "0.1.0"
 description = "Status updater for somebar."
 readme = "README.md"
 requires-python = ">=3.14"
-dependencies = ["aiofiles", "pydantic"]
+dependencies = [
+  "aiofiles",
+  "psutil",
+  "pydantic",
+]
 
 [project.scripts]
 pysomebar = "pysomebar:main"

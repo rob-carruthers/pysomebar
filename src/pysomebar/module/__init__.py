@@ -1,6 +1,7 @@
 """Modules."""
 
+from .battery import BatteryModule
 from .date import DateModule
-from .module import Module, RandomModule
+from .module import Module
 
-__all__ = ["DateModule", "Module", "RandomModule"]
+__all__ = ["BatteryModule", "DateModule", "Module"]

@@ -1,3 +1,6 @@
+[battery]
+enabled = true
+
 [date]
 enabled = true
 format = "%d/%m/%Y %H:%M"
