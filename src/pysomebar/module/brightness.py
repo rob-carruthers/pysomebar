@@ -1,0 +1,68 @@
+"""Brightness module for pysomebar."""
+
+from pathlib import Path
+
+import aiofiles
+from asyncinotify import Inotify, Mask
+
+from pysomebar.config import CONFIG
+
+from .module import Module
+
+
+class BrightnessModule(Module):
+    """Module for monitoring brightness via /sys/class/backlight/."""
+
+    def __init__(self) -> None:  # noqa: D107
+        super().__init__(CONFIG.pulse.interval)
+
+        self.enabled = CONFIG.pulse.enabled
+        self.do_initial_update = False
+
+    async def update(self) -> None:
+        """Passthrough as we handle everything in loop()."""
+
+    async def get_brightness(self) -> int | None:
+        """Retrieve brightness % from /sys/class/backlight/."""
+        if not self.enabled or CONFIG.brightness.device is None:
+            return None
+
+        top_path = Path("/sys/class/backlight") / CONFIG.brightness.device
+        async with aiofiles.open(top_path / "brightness") as f:
+            brightness = int(await f.read())
+
+        async with aiofiles.open(top_path / "max_brightness") as f:
+            max_brightness = int(await f.read())
+
+        return round(100 * brightness / max_brightness)
+
+    async def make_output(self, brightness_percent: int | None) -> None:
+        """Make output from brightness percent."""
+        self.output = f"󰍹 {brightness_percent}%"
+
+        if self.updater is not None:
+            self.updater.update_event.set()
+
+    async def loop(self) -> None:
+        """Update output with current date/time in chosen format."""
+        if not self.enabled or CONFIG.brightness.device is None:
+            return
+
+        top_path = Path("/sys/class/backlight") / CONFIG.brightness.device
+
+        if not top_path.exists():
+            raise FileNotFoundError
+
+        brightness_percent = await self.get_brightness()
+        await self.make_output(brightness_percent)
+
+        with Inotify() as inotify:
+            # Watch for MODIFY events, i.e. when the brightness has actually changed
+            # (brightnessctl, for example, writes directly to this file)
+            inotify.add_watch(top_path, Mask.MODIFY)
+
+            async for event in inotify:
+                if event.name is not None and event.name.name == "brightness":
+                    brightness_percent = await self.get_brightness()
+
+                    await self.make_output(brightness_percent)

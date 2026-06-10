@@ -2,6 +2,11 @@
 enabled = true
 interval = 10
 
+[brightness]
+enabled = true
+interval = 5
+device = "nvidia_wmi_ec_backlight"
+
 [date]
 enabled = true
 interval = 5

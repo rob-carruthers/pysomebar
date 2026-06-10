@@ -26,6 +26,12 @@ class BatteryModuleConfig(ModuleConfig):
     """Config for battery module."""
 
 
+class BrightnessModuleConfig(ModuleConfig):
+    """Config for brightness module."""
+
+    device: str | None = None
+
+
 class DateModuleConfig(ModuleConfig):
     """Config for the date/time module.
 
@@ -53,6 +59,7 @@ class Config(BaseModel):
     """Top-level config."""
 
     battery: BatteryModuleConfig = BatteryModuleConfig()
+    brightness: BrightnessModuleConfig = BrightnessModuleConfig()
     date: DateModuleConfig = DateModuleConfig()
     pulse: PulseModuleConfig = PulseModuleConfig()
     temp: TempModuleConfig = TempModuleConfig()
