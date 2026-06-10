@@ -41,9 +41,12 @@ class SomebarUpdater:
         """Write output to somebar's named pipe."""
         joined_output = " | ".join(module.output for module in self._modules)
 
-        async with aiofiles.open(SOMEBAR, "w") as f:
-            status = f"status {joined_output}\n"
-            await f.write(status)
+        if joined_output != self.last_output:
+            async with aiofiles.open(SOMEBAR, "w") as f:
+                status = f"status {joined_output}\n"
+                await f.write(status)
+
+            self.last_output = joined_output
 
         self.update_event.clear()
 
