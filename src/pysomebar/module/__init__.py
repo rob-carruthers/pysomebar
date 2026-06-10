@@ -3,5 +3,6 @@
 from .battery import BatteryModule
 from .date import DateModule
 from .module import Module
+from .pulse import PulseModule
 
-__all__ = ["BatteryModule", "DateModule", "Module"]
+__all__ = ["BatteryModule", "DateModule", "Module", "PulseModule"]

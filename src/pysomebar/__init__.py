@@ -7,7 +7,7 @@ from pathlib import Path
 
 import aiofiles
 
-from .module import BatteryModule, DateModule, Module
+from .module import BatteryModule, DateModule, Module, PulseModule
 
 XDG_RUNTIME_DIR = os.environ["XDG_RUNTIME_DIR"]
 SOMEBAR = Path(XDG_RUNTIME_DIR) / "somebar-0"
@@ -71,6 +71,7 @@ class SomebarUpdater:
 async def main_loop() -> None:
     """Start main async loop."""
     updater = SomebarUpdater()
+    await updater.add_module(PulseModule(300))
     await updater.add_module(BatteryModule(10))
     await updater.add_module(DateModule(5))
     await updater.initial_update()

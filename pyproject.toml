@@ -7,6 +7,7 @@ requires-python = ">=3.14"
 dependencies = [
   "aiofiles",
   "psutil",
+  "pulsectl-asyncio",
   "pydantic",
 ]
 

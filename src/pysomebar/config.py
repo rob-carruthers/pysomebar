@@ -38,11 +38,16 @@ class DateModuleConfig(ModuleConfig):
     format: str = "%d/%m/%Y %H:%M"
 
 
+class PulseModuleConfig(ModuleConfig):
+    """Config for pulse module."""
+
+
 class Config(BaseModel):
     """Top-level config."""
 
     battery: BatteryModuleConfig = BatteryModuleConfig()
     date: DateModuleConfig = DateModuleConfig()
+    pulse: PulseModuleConfig = PulseModuleConfig()
 
 
 try:
