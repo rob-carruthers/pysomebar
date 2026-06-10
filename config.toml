@@ -7,3 +7,7 @@ format = "%d/%m/%Y %H:%M"
 
 [pulse]
 enabled = true
+
+[temp]
+enabled = true
+device = "k10temp"

@@ -42,12 +42,19 @@ class PulseModuleConfig(ModuleConfig):
     """Config for pulse module."""
 
 
+class TempModuleConfig(ModuleConfig):
+    """Config for temp module."""
+
+    device: str | None = None
+
+
 class Config(BaseModel):
     """Top-level config."""
 
     battery: BatteryModuleConfig = BatteryModuleConfig()
     date: DateModuleConfig = DateModuleConfig()
     pulse: PulseModuleConfig = PulseModuleConfig()
+    temp: TempModuleConfig = TempModuleConfig()
 
 
 try:
