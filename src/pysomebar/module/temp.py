@@ -20,7 +20,7 @@ def convert_time(seconds: int) -> str:
 class TempModule(Module):
     """Module for showing temps."""
 
-    thresholds = MappingProxyType({75: "", 60: "", -1: ""})
+    thresholds = MappingProxyType({75: "", 60: "", 50: "", -274: ""})
 
     def __init__(self) -> None:  # noqa: D107
         super().__init__(CONFIG.temp.interval)
