@@ -1,5 +1,7 @@
 """Temp module for pysomebar."""
 
+from types import MappingProxyType
+
 import psutil
 
 from pysomebar.config import CONFIG
@@ -18,6 +20,8 @@ def convert_time(seconds: int) -> str:
 class TempModule(Module):
     """Module for showing temps."""
 
+    thresholds = MappingProxyType({75: "", 60: "", -1: ""})
+
     def __init__(self) -> None:  # noqa: D107
         super().__init__(CONFIG.temp.interval)
 
@@ -29,7 +33,9 @@ class TempModule(Module):
             return
 
         temp = round(float(psutil.sensors_temperatures()[CONFIG.temp.device][0].current))
-        self.output = f"{temp}°C"
+
+        icon = next(icon for threshold, icon in self.thresholds.items() if temp >= threshold)
+        self.output = f"{icon} {temp}°C"
 
         if self.updater is not None:
             self.updater.update_event.set()
