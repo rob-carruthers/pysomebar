@@ -18,8 +18,8 @@ def convert_time(seconds: int) -> str:
 class TempModule(Module):
     """Module for showing temps."""
 
-    def __init__(self, interval: int) -> None:  # noqa: D107
-        super().__init__(interval)
+    def __init__(self) -> None:  # noqa: D107
+        super().__init__(CONFIG.temp.interval)
 
         self.enabled = CONFIG.temp.enabled
 

@@ -1,13 +1,17 @@
 [battery]
 enabled = true
+interval = 10
 
 [date]
 enabled = true
+interval = 5
 format = "%d/%m/%Y %H:%M"
 
 [pulse]
 enabled = true
+interval = 300
 
 [temp]
 enabled = true
+interval = 5
 device = "k10temp"

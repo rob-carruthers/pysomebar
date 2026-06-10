@@ -73,10 +73,10 @@ class SomebarUpdater:
 async def main_loop() -> None:
     """Start main async loop."""
     updater = SomebarUpdater()
-    await updater.add_module(PulseModule(300))
-    await updater.add_module(TempModule(5))
-    await updater.add_module(BatteryModule(10))
-    await updater.add_module(DateModule(5))
+    await updater.add_module(PulseModule())
+    await updater.add_module(TempModule())
+    await updater.add_module(BatteryModule())
+    await updater.add_module(DateModule())
     await updater.initial_update()
     await updater.loop()
 

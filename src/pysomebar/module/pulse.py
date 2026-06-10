@@ -15,8 +15,8 @@ class PulseModule(Module):
 
     vol_muted = ""
 
-    def __init__(self, interval: int) -> None:  # noqa: D107
-        super().__init__(interval)
+    def __init__(self) -> None:  # noqa: D107
+        super().__init__(CONFIG.pulse.interval)
 
         self.enabled = CONFIG.pulse.enabled
         self.do_initial_update = False

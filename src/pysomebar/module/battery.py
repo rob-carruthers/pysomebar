@@ -51,8 +51,8 @@ class BatteryModule(Module):
         },
     )
 
-    def __init__(self, interval: int) -> None:  # noqa: D107
-        super().__init__(interval)
+    def __init__(self) -> None:  # noqa: D107
+        super().__init__(CONFIG.battery.interval)
 
         self.enabled = CONFIG.battery.enabled
 

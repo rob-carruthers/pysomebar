@@ -19,6 +19,7 @@ class ModuleConfig(BaseModel):
     """
 
     enabled: bool = False
+    interval: int = 5
 
 
 class BatteryModuleConfig(ModuleConfig):
