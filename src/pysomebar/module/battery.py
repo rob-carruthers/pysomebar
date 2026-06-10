@@ -54,7 +54,7 @@ class BatteryModule(Module):
     def __init__(self, interval: int) -> None:  # noqa: D107
         super().__init__(interval)
 
-        self.enabled = CONFIG.date.enabled
+        self.enabled = CONFIG.battery.enabled
 
     def get_icon(self, percent: float, *, is_charging: bool = False) -> str:
         """Retrieve an appropriate icon from self.(dis)charging_icons."""
@@ -78,7 +78,7 @@ class BatteryModule(Module):
         return f"{icon} {int(percent)}%, {formatted_time} remaining"
 
     async def update(self) -> None:
-        """Update output with current date/time in chosen format."""
+        """Update output with current battery status."""
         if not self.enabled:
             return
 
