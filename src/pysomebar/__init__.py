@@ -53,6 +53,8 @@ class SomebarUpdater:
             return
 
         for module in self._modules:
+            if not module.do_initial_update:
+                continue
             await module.update()
 
         await self.write_output()

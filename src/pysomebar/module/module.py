@@ -14,6 +14,7 @@ class Module(ABC):
     def __init__(self, interval: int) -> None:  # noqa: D107
         self.updater: SomebarUpdater | None = None
         self.interval = interval
+        self.do_initial_update = True
         self.output: str = ""
         self.enabled: bool = False
 
