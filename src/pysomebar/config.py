@@ -2,10 +2,13 @@
 
 import tomllib
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel
 
 CONFIG_FILE = "./config.toml"
+
+BarType = Literal["somebar"]
 
 
 class ModuleConfig(BaseModel):
@@ -58,6 +61,7 @@ class TempModuleConfig(ModuleConfig):
 class Config(BaseModel):
     """Top-level config."""
 
+    bar_type: BarType = "somebar"
     battery: BatteryModuleConfig = BatteryModuleConfig()
     brightness: BrightnessModuleConfig = BrightnessModuleConfig()
     date: DateModuleConfig = DateModuleConfig()

@@ -1,3 +1,5 @@
+bar_type = "somebar"
+
 [battery]
 enabled = true
 interval = 10
