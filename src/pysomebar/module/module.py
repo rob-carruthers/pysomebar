@@ -5,14 +5,14 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from pysomebar import SomebarUpdater
+    from pysomebar.updater import Updater
 
 
 class Module(ABC):
     """Abstract base class for modules."""
 
     def __init__(self, interval: int) -> None:  # noqa: D107
-        self.updater: SomebarUpdater | None = None
+        self.updater: Updater | None = None
         self.interval = interval
         self.do_initial_update = True
         self.output: str = ""
