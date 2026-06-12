@@ -4,7 +4,14 @@ import asyncio
 
 from pysomebar.config import CONFIG
 
-from .module import BatteryModule, BrightnessModule, DateModule, PulseModule, TempModule
+from .module import (
+    BatteryModule,
+    BrightnessModule,
+    DateModule,
+    PortageModule,
+    PulseModule,
+    TempModule,
+)
 from .updater import SomebarUpdater
 
 
@@ -18,6 +25,7 @@ async def main_loop() -> None:
     await updater.add_module(BrightnessModule())
     await updater.add_module(TempModule())
     await updater.add_module(BatteryModule())
+    await updater.add_module(PortageModule())
     await updater.add_module(DateModule())
     await updater.initial_update()
     await updater.loop()

@@ -14,6 +14,11 @@ enabled = true
 interval = 5
 format = "%d/%m/%Y %H:%M"
 
+[portage]
+enabled = true
+interval = 3600
+watch_file = "/var/cache/eix/portage.eix"
+
 [pulse]
 enabled = true
 interval = 300

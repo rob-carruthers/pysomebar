@@ -48,6 +48,12 @@ class DateModuleConfig(ModuleConfig):
     format: str = "%d/%m/%Y %H:%M"
 
 
+class PortageModuleConfig(ModuleConfig):
+    """Config for pulse module."""
+
+    watch_file: Path = Path("/var/cache/eix/portage.eix")
+
+
 class PulseModuleConfig(ModuleConfig):
     """Config for pulse module."""
 
@@ -66,6 +72,7 @@ class Config(BaseModel):
     brightness: BrightnessModuleConfig = BrightnessModuleConfig()
     date: DateModuleConfig = DateModuleConfig()
     pulse: PulseModuleConfig = PulseModuleConfig()
+    portage: PortageModuleConfig = PortageModuleConfig()
     temp: TempModuleConfig = TempModuleConfig()
 
 
