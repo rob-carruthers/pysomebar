@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import aiofiles
-from asyncinotify import Inotify, Mask
+from asyncinotify import Mask
 
 from pysomebar.config import CONFIG
 
@@ -27,11 +27,11 @@ class BrightnessModule(Module):
         if not self.enabled or CONFIG.brightness.device is None:
             return None
 
-        top_path = Path("/sys/class/backlight") / CONFIG.brightness.device
-        async with aiofiles.open(top_path / "brightness") as f:
+        backlight_dir = Path("/sys/class/backlight") / CONFIG.brightness.device
+        async with aiofiles.open(backlight_dir / "brightness") as f:
             brightness = int(await f.read())
 
-        async with aiofiles.open(top_path / "max_brightness") as f:
+        async with aiofiles.open(backlight_dir / "max_brightness") as f:
             max_brightness = int(await f.read())
 
         return round(100 * brightness / max_brightness)
@@ -48,21 +48,17 @@ class BrightnessModule(Module):
         if not self.enabled or CONFIG.brightness.device is None:
             return
 
-        top_path = Path("/sys/class/backlight") / CONFIG.brightness.device
+        brightness_file = Path("/sys/class/backlight") / CONFIG.brightness.device / "brightness"
 
-        if not top_path.exists():
+        if not brightness_file.exists():
             raise FileNotFoundError
 
         brightness_percent = await self.get_brightness()
         await self.make_output(brightness_percent)
 
-        with Inotify() as inotify:
-            # Watch for MODIFY events, i.e. when the brightness has actually changed
-            # (brightnessctl, for example, writes directly to this file)
-            inotify.add_watch(top_path, Mask.MODIFY)
+        # Watch for MODIFY events, i.e. when the brightness has actually changed
+        # (brightnessctl, for example, writes directly to this file)
+        async for _ in self.watch_files(brightness_file, mask=Mask.MODIFY):
+            brightness_percent = await self.get_brightness()
 
-            async for event in inotify:
-                if event.name is not None and event.name.name == "brightness":
-                    brightness_percent = await self.get_brightness()
-
-                    await self.make_output(brightness_percent)
+            await self.make_output(brightness_percent)

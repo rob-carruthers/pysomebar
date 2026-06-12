@@ -4,7 +4,12 @@ import asyncio
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
+from asyncinotify import Event, Inotify, Mask
+
 if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
+    from pathlib import Path
+
     from pysomebar.updater import Updater
 
 
@@ -34,3 +39,36 @@ class Module(ABC):
             except asyncio.TimeoutError:  # noqa: UP041
                 continue
             await asyncio.sleep(self.interval)
+
+    @staticmethod
+    async def watch_files(
+        *files: Path,
+        mask: Mask = Mask.MODIFY,
+    ) -> AsyncGenerator[Event]:
+        """Watch inotify events on `files`, yielding an async generator of events.
+
+        If an element of `files` is a dir, watch events on that dir. If a file, set up an inotify
+        watch on the parent dir and filter the dir's events to match only files in `files`.
+
+        Parameters
+        ----------
+        *files : Path
+            The file(s)/dir(s) to watch.
+
+        mask : asyncinotify.Mask
+            The mask of events to watch for.
+
+        """
+        watch_dirs = {file for file in files if file.is_dir()}
+        watch_files_ = {file for file in files if not file.is_dir()}
+        parent_dirs = {file.parent for file in watch_files_}
+
+        with Inotify() as inotify:
+            for dir_ in watch_dirs | parent_dirs:
+                inotify.add_watch(dir_, mask)
+
+            async for event in inotify:
+                if event.path is None:
+                    continue
+                if event.path in watch_files_ or event.path.parent in watch_dirs:
+                    yield event
