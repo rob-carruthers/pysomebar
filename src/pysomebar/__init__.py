@@ -12,7 +12,7 @@ from .module import (
     PulseModule,
     TempModule,
 )
-from .updater import SomebarUpdater
+from .updater import DwlbUpdater, SomebarUpdater
 
 
 async def main_loop() -> None:
@@ -20,6 +20,8 @@ async def main_loop() -> None:
     match CONFIG.bar_type:
         case "somebar":
             updater = SomebarUpdater()
+        case "dwlb":
+            updater = DwlbUpdater()
 
     await updater.add_module(PulseModule())
     await updater.add_module(BrightnessModule())

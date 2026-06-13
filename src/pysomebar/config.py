@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 CONFIG_FILE = "./config.toml"
 
-BarType = Literal["somebar"]
+BarType = Literal["somebar", "dwlb"]
 
 
 class ModuleConfig(BaseModel):

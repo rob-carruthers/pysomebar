@@ -1,4 +1,4 @@
-bar_type = "somebar"
+bar_type = "dwlb"
 
 [battery]
 enabled = true

@@ -66,7 +66,11 @@ class Updater(ABC):
 
 
 class SomebarUpdater(Updater):
-    """Updater for `somebar`."""
+    """Updater for `somebar`.
+
+    Updates somebar via its named pipe in $XDG_RUNTIME_DIR. An update is performed by writing a
+    string beginning "status " to the pipe, followed by the bar text and a newline.
+    """
 
     def __init__(self, separator: str = " | ") -> None:  # noqa: D107
         super().__init__(separator)
@@ -90,6 +94,29 @@ class SomebarUpdater(Updater):
                 status = f"status {joined_output}\n"
                 await f.write(status)
 
+            self.last_output = joined_output
+
+        self.update_event.clear()
+
+
+class DwlbUpdater(Updater):
+    """Updater for `dwlb`.
+
+    Usually dwlb will be initialised via `dwl -s dwlb`. `pysomebar` should then be piped into
+    another instance of dwlb, which will update status on stdout write. i.e.:
+
+    uv run pysomebar | dwlb -status-stdin all
+    """
+
+    def __init__(self, separator: str = " | ") -> None:  # noqa: D107
+        super().__init__(separator)
+
+    async def write_output(self) -> None:
+        """Write output to stdout."""
+        joined_output = " | ".join(module.output for module in self._modules)
+
+        if joined_output != self.last_output:
+            print(joined_output, flush=True)  # noqa: T201
             self.last_output = joined_output
 
         self.update_event.clear()
