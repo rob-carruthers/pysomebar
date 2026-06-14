@@ -14,11 +14,12 @@ from .module import Module
 class PortageModule(Module):
     """Module for printing date/time."""
 
-    def __init__(self) -> None:  # noqa: D107
+    def __init__(self, spinner: str = "Syncing portage...") -> None:  # noqa: D107
         super().__init__(CONFIG.portage.interval)
 
         self.enabled = CONFIG.portage.enabled
         self.do_initial_update = False
+        self.spinner = spinner
         self._lock = asyncio.Lock()
 
     async def update(self) -> None:
@@ -37,8 +38,15 @@ class PortageModule(Module):
 
         return len(updates)
 
-    async def make_output(self, n_updates: int) -> None:
-        """Make output from n_updates."""
+    async def make_output(self) -> None:
+        """Set 'spinner', get `n_updates` and update status."""
+        async with self._lock:
+            self.output = self.spinner
+            if self.updater is not None:
+                self.updater.update_event.set()
+
+            n_updates = await asyncio.to_thread(self.get_n_updates)
+
         self.output = f"Updates: {n_updates}"
 
         if self.updater is not None:
@@ -49,14 +57,10 @@ class PortageModule(Module):
         if not self.enabled:
             return
 
-        async with self._lock:
-            n_updates = await asyncio.to_thread(self.get_n_updates)
-        await self.make_output(n_updates)
+        await self.make_output()
 
         async for _ in self.watch_files(
             CONFIG.portage.watch_file,
             mask=Mask.MODIFY | Mask.MOVED_TO,
         ):
-            async with self._lock:
-                n_updates = await asyncio.to_thread(self.get_n_updates)
-            await self.make_output(n_updates)
+            await self.make_output()
