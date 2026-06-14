@@ -1,5 +1,7 @@
 """Battery module for pysomebar."""
 
+from pysomebar.util import make_dwlb_colored_text
+
 from types import MappingProxyType
 
 import psutil
@@ -50,6 +52,7 @@ class BatteryModule(Module):
             100: "󰁹",
         },
     )
+    colors = MappingProxyType({30: "green_d", 20: "yellow_d", 0: "red_d"})
 
     def __init__(self) -> None:  # noqa: D107
         super().__init__(CONFIG.battery.interval)
@@ -85,6 +88,11 @@ class BatteryModule(Module):
         battery = psutil.sensors_battery()
         is_charging = battery.power_plugged is True
         self.output = self.make_output(battery.percent, battery.secsleft, is_charging=is_charging)
+
+        if CONFIG.bar_type == "dwlb":
+            rounded = int((battery.percent // 10) * 10)
+            color = next(color for thresh, color in self.colors.items() if rounded >= thresh)
+            self.output = make_dwlb_colored_text(self.output, fg=color)
 
         if self.updater is not None:
             self.updater.update_event.set()
