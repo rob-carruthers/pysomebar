@@ -64,6 +64,7 @@ class PortageModuleConfig(ModuleConfig):
     """Config for pulse module."""
 
     watch_file: Path = Path("/var/cache/eix/portage.eix")
+    available_updates_color: str = "white"
 
 
 class PulseModuleConfig(ModuleConfig):

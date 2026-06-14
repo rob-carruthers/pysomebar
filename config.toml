@@ -9,6 +9,7 @@ yellow_d = "#e7c173"
 red_d = "#b74e58"
 white0 = "#bbc3d4"
 gray5 = "#60728a"
+magenta = "#b48ead"
 
 [battery]
 enabled = true
@@ -30,6 +31,7 @@ format = "%d/%m/%Y %H:%M"
 enabled = true
 interval = 3600
 watch_file = "/var/cache/eix/portage.eix"
+available_updates_color = "magenta"
 
 [pulse]
 enabled = true

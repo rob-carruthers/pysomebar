@@ -1,5 +1,7 @@
 """Portage updates module for pysomebar."""
 
+from pysomebar.util import make_dwlb_colored_text
+
 import asyncio
 import re
 import subprocess
@@ -48,6 +50,12 @@ class PortageModule(Module):
             n_updates = await asyncio.to_thread(self.get_n_updates)
 
         self.output = f"Updates: {n_updates}" if n_updates > 0 else "No updates"
+
+        if CONFIG.bar_type == "dwlb" and n_updates > 0:
+            self.output = make_dwlb_colored_text(
+                self.output,
+                fg=CONFIG.portage.available_updates_color,
+            )
 
         if self.updater is not None:
             self.updater.update_event.set()
