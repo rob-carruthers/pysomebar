@@ -1,7 +1,5 @@
 """Portage updates module for pysomebar."""
 
-from pysomebar.util import make_dwlb_colored_text
-
 import asyncio
 import re
 import subprocess
@@ -9,6 +7,7 @@ import subprocess
 from asyncinotify import Mask
 
 from pysomebar.config import CONFIG
+from pysomebar.util import make_dwlb_colored_text
 
 from .module import Module
 
