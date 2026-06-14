@@ -69,6 +69,8 @@ class PortageModuleConfig(ModuleConfig):
 class PulseModuleConfig(ModuleConfig):
     """Config for pulse module."""
 
+    mute_color: str = "white"
+
 
 class TempModuleConfig(ModuleConfig):
     """Config for temp module.
