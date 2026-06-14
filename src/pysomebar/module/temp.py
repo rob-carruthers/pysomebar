@@ -5,6 +5,7 @@ from types import MappingProxyType
 import psutil
 
 from pysomebar.config import CONFIG
+from pysomebar.util import make_dwlb_colored_text
 
 from .module import Module
 
@@ -20,7 +21,14 @@ def convert_time(seconds: int) -> str:
 class TempModule(Module):
     """Module for showing temps."""
 
-    thresholds = MappingProxyType({75: "", 60: "", 50: "", -274: ""})
+    icons = MappingProxyType({75: "", 60: "", 50: "", -274: ""})
+    colors = MappingProxyType(
+        {
+            CONFIG.temp.red_threshold: "red_d",
+            CONFIG.temp.yellow_threshold: "yellow_d",
+            -274: "green_d",
+        },
+    )
 
     def __init__(self) -> None:  # noqa: D107
         super().__init__(CONFIG.temp.interval)
@@ -34,8 +42,12 @@ class TempModule(Module):
 
         temp = round(float(psutil.sensors_temperatures()[CONFIG.temp.device][0].current))
 
-        icon = next(icon for threshold, icon in self.thresholds.items() if temp >= threshold)
+        icon = next(icon for thresh, icon in self.icons.items() if temp >= thresh)
         self.output = f"{icon} {temp}°C"
+
+        if CONFIG.bar_type == "dwlb":
+            color = next(color for thresh, color in self.colors.items() if temp >= thresh)
+            self.output = make_dwlb_colored_text(self.output, fg=color)
 
         if self.updater is not None:
             self.updater.update_event.set()

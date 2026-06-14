@@ -71,9 +71,20 @@ class PulseModuleConfig(ModuleConfig):
 
 
 class TempModuleConfig(ModuleConfig):
-    """Config for temp module."""
+    """Config for temp module.
+
+    Attributes
+    ----------
+    yellow_threshold : int, default 60
+        Display status as yellow >= `yellow_threshold`.
+    red_threshold : int, default 75
+        Display status as red >= `red_threshold`.
+
+    """
 
     device: str | None = None
+    yellow_threshold: int = 60
+    red_threshold: int = 75
 
 
 class Config(BaseModel):
