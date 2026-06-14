@@ -47,7 +47,7 @@ class PortageModule(Module):
 
             n_updates = await asyncio.to_thread(self.get_n_updates)
 
-        self.output = f"Updates: {n_updates}"
+        self.output = f"Updates: {n_updates}" if n_updates > 0 else "No updates"
 
         if self.updater is not None:
             self.updater.update_event.set()
