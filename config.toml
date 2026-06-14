@@ -6,7 +6,7 @@ separator_color = "white0"
 [colors]
 green_d = "#97b67c"
 yellow_d = "#e7c173"
-red_d = "b74e58"
+red_d = "#b74e58"
 white0 = "#bbc3d4"
 
 [battery]
