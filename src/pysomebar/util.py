@@ -1,3 +1,5 @@
+"""Utility methods."""
+
 import re
 
 from pysomebar.config import CONFIG
