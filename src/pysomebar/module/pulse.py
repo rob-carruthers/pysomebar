@@ -6,6 +6,7 @@ import pulsectl_asyncio
 from pulsectl.pulsectl import PulseError, PulseSinkInfo
 
 from pysomebar.config import CONFIG
+from pysomebar.util import make_dwlb_colored_text
 
 from .module import Module
 
@@ -63,6 +64,9 @@ class PulseModule(Module):
             self.output = f"{self.vol_muted} {self.current_volume}% (muted)"
         else:
             self.output = f"{self.current_volume}%"
+
+        if CONFIG.bar_type == "dwlb" and self.current_muted:
+            self.output = make_dwlb_colored_text(self.output, fg=CONFIG.pulse.mute_color)
 
         if self.updater is not None:
             self.updater.update_event.set()

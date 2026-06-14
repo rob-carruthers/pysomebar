@@ -1,8 +1,20 @@
 bar_type = "dwlb"
+base_color = "white0"
+separator = " | "
+separator_color = "white0"
+
+[colors]
+green_d = "#97b67c"
+yellow_d = "#e7c173"
+red_d = "#b74e58"
+white0 = "#bbc3d4"
+gray5 = "#60728a"
 
 [battery]
 enabled = true
 interval = 10
+green_threshold = 30
+yellow_threshold = 20
 
 [brightness]
 enabled = true
@@ -22,6 +34,7 @@ watch_file = "/var/cache/eix/portage.eix"
 [pulse]
 enabled = true
 interval = 300
+mute_color = "gray5"
 
 [temp]
 enabled = true

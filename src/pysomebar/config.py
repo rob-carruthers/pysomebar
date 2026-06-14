@@ -26,7 +26,19 @@ class ModuleConfig(BaseModel):
 
 
 class BatteryModuleConfig(ModuleConfig):
-    """Config for battery module."""
+    """Config for battery module.
+
+    Attributes
+    ----------
+    green_threshold : int, default 30
+        Display status as green >= `green_threshold`.
+    yellow_threshold : int, default 20
+        Display status as yellow >= `yellow_threshold`.
+
+    """
+
+    green_threshold: int = 30
+    yellow_threshold: int = 20
 
 
 class BrightnessModuleConfig(ModuleConfig):
@@ -57,17 +69,34 @@ class PortageModuleConfig(ModuleConfig):
 class PulseModuleConfig(ModuleConfig):
     """Config for pulse module."""
 
+    mute_color: str = "white"
+
 
 class TempModuleConfig(ModuleConfig):
-    """Config for temp module."""
+    """Config for temp module.
+
+    Attributes
+    ----------
+    yellow_threshold : int, default 60
+        Display status as yellow >= `yellow_threshold`.
+    red_threshold : int, default 75
+        Display status as red >= `red_threshold`.
+
+    """
 
     device: str | None = None
+    yellow_threshold: int = 60
+    red_threshold: int = 75
 
 
 class Config(BaseModel):
     """Top-level config."""
 
     bar_type: BarType = "somebar"
+    base_color: str = "#ffffff"
+    separator: str = " | "
+    separator_color: str = "#ffffff"
+    colors: dict[str, str] = {"white": "#ffffff"}
     battery: BatteryModuleConfig = BatteryModuleConfig()
     brightness: BrightnessModuleConfig = BrightnessModuleConfig()
     date: DateModuleConfig = DateModuleConfig()
