@@ -68,6 +68,7 @@ class Config(BaseModel):
     """Top-level config."""
 
     bar_type: BarType = "somebar"
+    separator: str = " | "
     battery: BatteryModuleConfig = BatteryModuleConfig()
     brightness: BrightnessModuleConfig = BrightnessModuleConfig()
     date: DateModuleConfig = DateModuleConfig()

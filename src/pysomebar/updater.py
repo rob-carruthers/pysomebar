@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING
 
 import aiofiles
 
+from pysomebar.config import CONFIG
+
 if TYPE_CHECKING:
     from .module import Module
 
@@ -21,8 +23,8 @@ class Updater(ABC):
     Should be subclassed for a specific implementation (e.g. `somebar`, `dwlb`...)
     """
 
-    def __init__(self, separator: str = " | ") -> None:  # noqa: D107
-        self.separator = separator
+    def __init__(self) -> None:  # noqa: D107
+        self.separator = CONFIG.separator
         self._modules: list[Module] = []
         self.output: str = ""
         self.last_output: str = ""
@@ -72,8 +74,8 @@ class SomebarUpdater(Updater):
     string beginning "status " to the pipe, followed by the bar text and a newline.
     """
 
-    def __init__(self, separator: str = " | ") -> None:  # noqa: D107
-        super().__init__(separator)
+    def __init__(self) -> None:  # noqa: D107
+        super().__init__()
         xdg_runtime_dir = os.environ["XDG_RUNTIME_DIR"]
         self.somebar = Path(xdg_runtime_dir) / "somebar-0"
 
@@ -87,7 +89,7 @@ class SomebarUpdater(Updater):
 
     async def write_output(self) -> None:
         """Write output to somebar's named pipe."""
-        joined_output = " | ".join(module.output for module in self._modules)
+        joined_output = self.separator.join(module.output for module in self._modules)
 
         if joined_output != self.last_output:
             async with aiofiles.open(self.somebar, "w") as f:
@@ -108,12 +110,12 @@ class DwlbUpdater(Updater):
     uv run pysomebar | dwlb -status-stdin all
     """
 
-    def __init__(self, separator: str = " | ") -> None:  # noqa: D107
-        super().__init__(separator)
+    def __init__(self) -> None:  # noqa: D107
+        super().__init__()
 
     async def write_output(self) -> None:
         """Write output to stdout."""
-        joined_output = " | ".join(module.output for module in self._modules)
+        joined_output = self.separator.join(module.output for module in self._modules)
 
         if joined_output != self.last_output:
             print(joined_output, flush=True)  # noqa: T201

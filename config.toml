@@ -1,4 +1,5 @@
 bar_type = "dwlb"
+separator = " | "
 
 [battery]
 enabled = true
