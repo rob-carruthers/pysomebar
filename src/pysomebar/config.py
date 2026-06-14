@@ -68,7 +68,10 @@ class Config(BaseModel):
     """Top-level config."""
 
     bar_type: BarType = "somebar"
+    base_color: str = "#ffffff"
     separator: str = " | "
+    separator_color: str = "#ffffff"
+    colors: dict[str, str] = {"white": "#ffffff"}
     battery: BatteryModuleConfig = BatteryModuleConfig()
     brightness: BrightnessModuleConfig = BrightnessModuleConfig()
     date: DateModuleConfig = DateModuleConfig()
