@@ -12,6 +12,8 @@ white0 = "#bbc3d4"
 [battery]
 enabled = true
 interval = 10
+green_threshold = 30
+yellow_threshold = 20
 
 [brightness]
 enabled = true

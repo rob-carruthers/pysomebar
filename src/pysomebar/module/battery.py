@@ -1,12 +1,11 @@
 """Battery module for pysomebar."""
 
-from pysomebar.util import make_dwlb_colored_text
-
 from types import MappingProxyType
 
 import psutil
 
 from pysomebar.config import CONFIG
+from pysomebar.util import make_dwlb_colored_text
 
 from .module import Module
 
@@ -52,7 +51,13 @@ class BatteryModule(Module):
             100: "󰁹",
         },
     )
-    colors = MappingProxyType({30: "green_d", 20: "yellow_d", 0: "red_d"})
+    colors = MappingProxyType(
+        {
+            CONFIG.battery.green_threshold: "green_d",
+            CONFIG.battery.yellow_threshold: "yellow_d",
+            -1: "red_d",
+        },
+    )
 
     def __init__(self) -> None:  # noqa: D107
         super().__init__(CONFIG.battery.interval)

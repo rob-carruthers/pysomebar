@@ -26,7 +26,19 @@ class ModuleConfig(BaseModel):
 
 
 class BatteryModuleConfig(ModuleConfig):
-    """Config for battery module."""
+    """Config for battery module.
+
+    Attributes
+    ----------
+    green_threshold : int, default 30
+        Display status as green >= `green_threshold`.
+    yellow_threshold : int, default 20
+        Display status as yellow >= `yellow_threshold`.
+
+    """
+
+    green_threshold: int = 30
+    yellow_threshold: int = 20
 
 
 class BrightnessModuleConfig(ModuleConfig):
