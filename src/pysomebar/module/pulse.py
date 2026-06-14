@@ -1,6 +1,7 @@
 """Pulseaudio volume module for pysomebar."""
 
 import asyncio
+from types import MappingProxyType
 
 import pulsectl_asyncio
 from pulsectl.pulsectl import PulseError, PulseSinkInfo
@@ -14,7 +15,8 @@ from .module import Module
 class PulseModule(Module):
     """Module for monitoring volume via Pulseaudio API."""
 
-    vol_muted = ""
+    vol_muted_icon = ""
+    vol_icons = MappingProxyType({70: "", 40: "", -1: ""})
 
     def __init__(self) -> None:  # noqa: D107
         super().__init__(CONFIG.pulse.interval)
@@ -61,9 +63,12 @@ class PulseModule(Module):
     async def make_output(self) -> None:
         """Make output from volume and mute status."""
         if self.current_muted:
-            self.output = f"{self.vol_muted} {self.current_volume}% (muted)"
+            self.output = f"{self.vol_muted_icon} {self.current_volume}% (muted)"
         else:
-            self.output = f"{self.current_volume}%"
+            icon = next(
+                icon for thresh, icon in self.vol_icons.items() if self.current_volume >= thresh
+            )
+            self.output = f"{icon} {self.current_volume}%"
 
         if CONFIG.bar_type == "dwlb" and self.current_muted:
             self.output = make_dwlb_colored_text(self.output, fg=CONFIG.pulse.mute_color)
