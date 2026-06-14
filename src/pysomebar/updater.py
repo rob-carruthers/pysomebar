@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 import aiofiles
 
 from pysomebar.config import CONFIG
+from pysomebar.util import make_dwlb_colored_text
 
 if TYPE_CHECKING:
     from .module import Module
@@ -112,6 +113,7 @@ class DwlbUpdater(Updater):
 
     def __init__(self) -> None:  # noqa: D107
         super().__init__()
+        self.separator = make_dwlb_colored_text(self.separator, fg=CONFIG.separator_color)
 
     async def write_output(self) -> None:
         """Write output to stdout."""
