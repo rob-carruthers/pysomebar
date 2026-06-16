@@ -5,8 +5,11 @@ from pathlib import Path
 from typing import Literal
 
 from pydantic import BaseModel
+from xdg_base_dirs import xdg_config_home
 
-CONFIG_FILE = "./config.toml"
+xdg_config = xdg_config_home() / "pysomebar" / "config.toml"
+
+CONFIG_FILE = xdg_config.resolve() if xdg_config.exists() else Path("./config.toml")
 
 BarType = Literal["somebar", "dwlb"]
 
@@ -107,7 +110,7 @@ class Config(BaseModel):
 
 
 try:
-    with Path(CONFIG_FILE).open("rb") as f:
+    with CONFIG_FILE.open("rb") as f:
         data = tomllib.load(f)
 
     CONFIG = Config(**data)

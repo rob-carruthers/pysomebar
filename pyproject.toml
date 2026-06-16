@@ -10,6 +10,7 @@ dependencies = [
   "psutil",
   "pulsectl-asyncio",
   "pydantic",
+  "xdg-base-dirs",
 ]
 
 [project.scripts]
