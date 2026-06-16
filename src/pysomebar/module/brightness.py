@@ -14,9 +14,9 @@ class BrightnessModule(Module):
     """Module for monitoring brightness via /sys/class/backlight/."""
 
     def __init__(self) -> None:  # noqa: D107
-        super().__init__(CONFIG.pulse.interval)
+        super().__init__(CONFIG.brightness.interval)
 
-        self.enabled = CONFIG.pulse.enabled
+        self.enabled = CONFIG.brightness.enabled
         self.do_initial_update = False
 
     async def update(self) -> None:
