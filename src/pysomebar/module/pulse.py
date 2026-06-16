@@ -50,7 +50,10 @@ class PulseModule(Module):
         default_sink_name = (await self.pulse.server_info()).default_sink_name
         sinks: list[PulseSinkInfo] = await self.pulse.sink_list()
 
-        default_sink = next(sink for sink in sinks if sink.name == default_sink_name)  # ty:ignore[unresolved-attribute]
+        default_sink = next((sink for sink in sinks if sink.name == default_sink_name), None)  # ty:ignore[unresolved-attribute]
+        if default_sink is None:
+            return self.current_volume, self.current_muted
+
         raw_vol = float(default_sink.volume.values[0])
         volume = round(raw_vol * 100)
         muted = bool(getattr(default_sink, "mute", True))
@@ -66,7 +69,8 @@ class PulseModule(Module):
             self.output = f"{self.vol_muted_icon} {self.current_volume}% (muted)"
         else:
             icon = next(
-                icon for thresh, icon in self.vol_icons.items() if self.current_volume >= thresh
+                (icon for thresh, icon in self.vol_icons.items() if self.current_volume >= thresh),
+                "?",
             )
             self.output = f"{icon} {self.current_volume}%"
 
