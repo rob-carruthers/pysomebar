@@ -2,7 +2,6 @@
 
 import asyncio
 import re
-import subprocess
 
 from asyncinotify import Mask
 
@@ -26,17 +25,18 @@ class PortageModule(Module):
     async def update(self) -> None:
         """Passthrough as we handle everything in loop()."""
 
-    def get_n_updates(self) -> int:
+    async def get_n_updates(self) -> int:
         """Get the number of portage updates available by running `emerge -NupDq world`."""
-        result = subprocess.run(
-            ["/usr/bin/emerge", "-NupDq", "world"],
-            check=False,
-            capture_output=True,
+        proc = await asyncio.create_subprocess_exec(
+            "/usr/bin/emerge",
+            "-NupDq",
+            "world",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.DEVNULL,
         )
-        stdout = result.stdout.decode().split("\n")
-
-        updates = [line for line in stdout if re.match(r"\[.*\]", line)]
-
+        stdout, _ = await proc.communicate()
+        lines = stdout.decode().split("\n")
+        updates = [line for line in lines if re.match(r"\[.*\]", line)]
         return len(updates)
 
     async def make_output(self) -> None:
@@ -46,7 +46,7 @@ class PortageModule(Module):
             if self.updater is not None:
                 self.updater.update_event.set()
 
-            n_updates = await asyncio.to_thread(self.get_n_updates)
+            n_updates = await self.get_n_updates()
 
         self.output = f"Updates: {n_updates}" if n_updates > 0 else "No updates"
 
