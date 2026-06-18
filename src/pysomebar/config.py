@@ -100,6 +100,7 @@ class Config(BaseModel):
     base_color: str = "#ffffff"
     separator: str = " | "
     separator_color: str = "#ffffff"
+    edge_padding: int = 0
     colors: dict[str, str] = {"white": "#ffffff"}
     battery: BatteryModuleConfig = BatteryModuleConfig()
     brightness: BrightnessModuleConfig = BrightnessModuleConfig()

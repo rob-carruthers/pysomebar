@@ -26,6 +26,7 @@ class Updater(ABC):
 
     def __init__(self) -> None:  # noqa: D107
         self.separator = CONFIG.separator
+        self.padding = CONFIG.edge_padding
         self._modules: list[Module] = []
         self.output: str = ""
         self.last_output: str = ""
@@ -40,6 +41,12 @@ class Updater(ABC):
         module.updater = self
         self.tasks.add(asyncio.create_task(module.loop()))
         self._modules.append(module)
+
+    def assemble_output(self) -> str:
+        """Assemble output from modules."""
+        joined_output = self.separator.join(module.output for module in self._modules)
+
+        return " " * self.padding + joined_output + " " * self.padding
 
     @abstractmethod
     async def write_output(self) -> None:
@@ -90,7 +97,7 @@ class SomebarUpdater(Updater):
 
     async def write_output(self) -> None:
         """Write output to somebar's named pipe."""
-        joined_output = self.separator.join(module.output for module in self._modules)
+        joined_output = self.assemble_output()
 
         if joined_output != self.last_output:
             async with aiofiles.open(self.somebar, "w") as f:
@@ -117,7 +124,7 @@ class DwlbUpdater(Updater):
 
     async def write_output(self) -> None:
         """Write output to stdout."""
-        joined_output = self.separator.join(module.output for module in self._modules)
+        joined_output = self.assemble_output()
 
         if joined_output != self.last_output:
             print(joined_output, flush=True)  # noqa: T201

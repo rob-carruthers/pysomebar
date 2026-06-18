@@ -2,6 +2,7 @@ bar_type = "dwlb"
 base_color = "white0"
 separator = " | "
 separator_color = "white0"
+edge_padding = 1
 
 [colors]
 green_d = "#97b67c"
