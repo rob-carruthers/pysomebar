@@ -4,7 +4,7 @@ import asyncio
 from types import MappingProxyType
 
 import pulsectl_asyncio
-from pulsectl.pulsectl import PulseError, PulseSinkInfo
+from pulsectl.pulsectl import PulseDisconnected, PulseError, PulseSinkInfo
 
 from pysomebar.config import CONFIG
 from pysomebar.util import make_dwlb_colored_text
@@ -101,16 +101,19 @@ class PulseModule(Module):
         self.current_volume, self.current_muted = await self.get_volume()
         await self.make_output()
 
-        async for event in self.pulse.subscribe_events("all"):
-            if event.facility != "sink":
-                continue
+        try:
+            async for event in self.pulse.subscribe_events("all"):
+                if event.facility != "sink":
+                    continue
 
-            volume, muted = await self.get_volume()
+                volume, muted = await self.get_volume()
 
-            if volume == self.current_volume and muted == self.current_muted:
-                continue
+                if volume == self.current_volume and muted == self.current_muted:
+                    continue
 
-            self.current_volume = volume
-            self.current_muted = muted
+                self.current_volume = volume
+                self.current_muted = muted
 
-            await self.make_output()
+                await self.make_output()
+        except PulseDisconnected:
+            pass
