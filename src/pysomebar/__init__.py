@@ -1,6 +1,7 @@
 """Main entry point for pysomebar."""
 
 import asyncio
+import contextlib
 
 from pysomebar.config import CONFIG
 
@@ -34,4 +35,5 @@ async def main_loop() -> None:
 
 
 def main() -> None:  # noqa: D103
-    asyncio.run(main_loop())
+    with contextlib.suppress(KeyboardInterrupt, BrokenPipeError):
+        asyncio.run(main_loop())
