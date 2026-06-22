@@ -23,4 +23,18 @@ def make_dwlb_colored_text(text: str, *, fg: str = "", bg: str = "") -> str:
     fg = fg.replace("#", "")
     bg = bg.replace("#", "")
 
-    return f"^fg({fg})^bg({bg}){text}^fg()^bg()"
+    output = ""
+
+    if fg:
+        output += f"^fg({fg})"
+    if bg:
+        output += f"^bg({bg})"
+
+    output += text
+
+    if fg:
+        output += "^fg()"
+    if bg:
+        output += "^bg()"
+
+    return output
