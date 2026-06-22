@@ -28,6 +28,11 @@ enabled = true
 interval = 5
 format = "%d/%m/%Y %H:%M"
 
+[pacman]
+enabled = true
+interval = 3600
+available_updates_color = "magenta"
+
 [portage]
 enabled = true
 interval = 3600

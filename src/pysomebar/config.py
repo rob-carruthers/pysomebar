@@ -63,6 +63,12 @@ class DateModuleConfig(ModuleConfig):
     format: str = "%d/%m/%Y %H:%M"
 
 
+class PacmanModuleConfig(ModuleConfig):
+    """Config for pulse module."""
+
+    available_updates_color: str = "white"
+
+
 class PortageModuleConfig(ModuleConfig):
     """Config for pulse module."""
 
@@ -106,6 +112,7 @@ class Config(BaseModel):
     brightness: BrightnessModuleConfig = BrightnessModuleConfig()
     date: DateModuleConfig = DateModuleConfig()
     pulse: PulseModuleConfig = PulseModuleConfig()
+    pacman: PacmanModuleConfig = PacmanModuleConfig()
     portage: PortageModuleConfig = PortageModuleConfig()
     temp: TempModuleConfig = TempModuleConfig()
 

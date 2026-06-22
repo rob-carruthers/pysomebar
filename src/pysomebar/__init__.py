@@ -9,6 +9,7 @@ from .module import (
     BatteryModule,
     BrightnessModule,
     DateModule,
+    PacmanModule,
     PortageModule,
     PulseModule,
     TempModule,
@@ -28,6 +29,7 @@ async def main_loop() -> None:
     await updater.add_module(BrightnessModule())
     await updater.add_module(TempModule())
     await updater.add_module(BatteryModule())
+    await updater.add_module(PacmanModule())
     await updater.add_module(PortageModule())
     await updater.add_module(DateModule())
     await updater.initial_update()
