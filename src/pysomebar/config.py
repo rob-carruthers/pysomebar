@@ -28,6 +28,10 @@ class ModuleConfig(BaseModel):
     interval: int = 5
 
 
+class MemoryModuleConfig(ModuleConfig):
+    pass
+
+
 class BatteryModuleConfig(ModuleConfig):
     """Config for battery module.
 
@@ -109,6 +113,7 @@ class Config(BaseModel):
     edge_padding: int = 0
     colors: dict[str, str] = {"white": "#ffffff"}
     battery: BatteryModuleConfig = BatteryModuleConfig()
+    memory: MemoryModuleConfig = MemoryModuleConfig()
     brightness: BrightnessModuleConfig = BrightnessModuleConfig()
     date: DateModuleConfig = DateModuleConfig()
     pulse: PulseModuleConfig = PulseModuleConfig()

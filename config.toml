@@ -12,6 +12,10 @@ white0 = "#bbc3d4"
 gray5 = "#60728a"
 magenta = "#b48ead"
 
+[memory]
+enabled = true
+interval = 10
+
 [battery]
 enabled = true
 interval = 10
