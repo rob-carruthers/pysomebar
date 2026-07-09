@@ -16,7 +16,7 @@ class PacmanModule(Module):
 
         self.enabled = CONFIG.pacman.enabled
 
-    async def update(self) -> None:
+    async def update(self) -> None:  # noqa: D102
         if not self.enabled:
             return
 
