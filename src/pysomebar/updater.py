@@ -28,7 +28,7 @@ class Updater(ABC):
     def __init__(self) -> None:  # noqa: D107
         self.separator = CONFIG.separator
         self.padding = CONFIG.edge_padding
-        self._modules: list[Module] = []
+        self.modules: list[Module] = []
         self.output: str = ""
         self.last_output: str = ""
         self.update_event = asyncio.Event()
@@ -41,11 +41,11 @@ class Updater(ABC):
 
         module.updater = self
         self.tasks.add(asyncio.create_task(module.loop()))
-        self._modules.append(module)
+        self.modules.append(module)
 
     def assemble_output(self) -> str:
         """Assemble output from modules."""
-        joined_output = self.separator.join(module.output for module in self._modules)
+        joined_output = self.separator.join(module.output for module in self.modules)
 
         return " " * self.padding + joined_output + " " * self.padding
 
@@ -55,10 +55,10 @@ class Updater(ABC):
 
     async def initial_update(self) -> None:
         """Initialise state/output for all held modules."""
-        if len(self._modules) < 1:
+        if len(self.modules) < 1:
             return
 
-        for module in self._modules:
+        for module in self.modules:
             if not module.do_initial_update:
                 continue
             await module.update()
@@ -67,7 +67,7 @@ class Updater(ABC):
 
     async def loop(self) -> None:
         """Continuously wait for updates/interval timeouts and write to named pipe."""
-        if len(self._modules) < 1:
+        if len(self.modules) < 1:
             return
 
         while True:
