@@ -29,7 +29,10 @@ class ModuleConfig(BaseModel):
 
 
 class MemoryModuleConfig(ModuleConfig):
-    pass
+    """Config for memory module.
+
+    Currently no additonal options.
+    """
 
 
 class BatteryModuleConfig(ModuleConfig):
