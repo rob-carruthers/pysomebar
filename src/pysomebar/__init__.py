@@ -13,6 +13,7 @@ from .module import (
     BrightnessModule,
     DateModule,
     MemoryModule,
+    Module,
     PacmanModule,
     PortageModule,
     PulseModule,
@@ -42,6 +43,20 @@ async def main_loop() -> None:
     await updater.add_module(PacmanModule())
     await updater.add_module(PortageModule())
     await updater.add_module(DateModule())
+
+    signal_groups: dict[int, list[Module]] = {}
+    for module in updater.modules:
+        if module.refresh_signal is not None:
+            signal_groups.setdefault(module.refresh_signal, []).append(module)
+
+    for offset, modules in signal_groups.items():
+
+        def handle_refresh(modules: list[Module] = modules) -> None:
+            for module in modules:
+                module.request_refresh()
+
+        loop.add_signal_handler(signal.SIGRTMIN + offset, handle_refresh)
+
     await updater.initial_update()
     updater_task = asyncio.create_task(updater.loop())
 

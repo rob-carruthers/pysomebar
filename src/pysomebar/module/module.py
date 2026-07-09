@@ -1,6 +1,7 @@
 """Modules for pysomebar."""
 
 import asyncio
+import contextlib
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -22,6 +23,12 @@ class Module(ABC):
         self.do_initial_update = True
         self.output: str = ""
         self.enabled: bool = False
+        self.refresh_signal: int | None = None
+        self.refresh_event = asyncio.Event()
+
+    def request_refresh(self) -> None:
+        """Signal this module to refresh immediately, bypassing its interval wait."""
+        self.refresh_event.set()
 
     @abstractmethod
     async def update(self) -> None:
@@ -38,7 +45,10 @@ class Module(ABC):
                 await asyncio.wait_for(self.update(), timeout=self.interval)
             except asyncio.TimeoutError:  # noqa: UP041
                 continue
-            await asyncio.sleep(self.interval)
+
+            with contextlib.suppress(asyncio.TimeoutError):
+                await asyncio.wait_for(self.refresh_event.wait(), timeout=self.interval)
+            self.refresh_event.clear()
 
     @staticmethod
     async def watch_files(

@@ -15,6 +15,7 @@ class PacmanModule(Module):
         super().__init__(CONFIG.pacman.interval)
 
         self.enabled = CONFIG.pacman.enabled
+        self.refresh_signal = 1
 
     async def update(self) -> None:  # noqa: D102
         if not self.enabled:
