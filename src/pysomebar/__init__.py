@@ -2,6 +2,9 @@
 
 import asyncio
 import contextlib
+import os
+import signal
+import sys
 
 from pysomebar.config import CONFIG
 
@@ -20,6 +23,11 @@ from .updater import DwlbUpdater, SomebarUpdater
 
 async def main_loop() -> None:
     """Start main async loop."""
+    # Set an event handler for SIGPIPE if using piped stdout - shutdown if the pipe is destroyed
+    loop = asyncio.get_running_loop()
+    stop_event = asyncio.Event()
+    loop.add_signal_handler(signal.SIGPIPE, stop_event.set)
+
     match CONFIG.bar_type:
         case "somebar":
             updater = SomebarUpdater()
@@ -35,9 +43,20 @@ async def main_loop() -> None:
     await updater.add_module(PortageModule())
     await updater.add_module(DateModule())
     await updater.initial_update()
-    await updater.loop()
+    updater_task = asyncio.create_task(updater.loop())
+
+    await stop_event.wait()
+    updater_task.cancel()
+
+    for task in updater.tasks:
+        task.cancel()
+    await asyncio.gather(updater_task, *updater.tasks, return_exceptions=True)
 
 
 def main() -> None:  # noqa: D103
+    # Safety net - broken pipe is handled in write_output()
     with contextlib.suppress(KeyboardInterrupt, BrokenPipeError):
         asyncio.run(main_loop())
+
+    devnull = os.open(os.devnull, os.O_WRONLY)
+    os.dup2(devnull, sys.stdout.fileno())

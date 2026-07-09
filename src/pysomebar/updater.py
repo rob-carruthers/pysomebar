@@ -1,6 +1,7 @@
 """Main entry point for pysomebar."""
 
 import asyncio
+import contextlib
 import os
 import time
 from abc import ABC, abstractmethod
@@ -100,11 +101,12 @@ class SomebarUpdater(Updater):
         joined_output = self.assemble_output()
 
         if joined_output != self.last_output:
-            async with aiofiles.open(self.somebar, "w") as f:
-                status = f"status {joined_output}\n"
-                await f.write(status)
+            with contextlib.suppress(BrokenPipeError):
+                async with aiofiles.open(self.somebar, "w") as f:
+                    status = f"status {joined_output}\n"
+                    await f.write(status)
 
-            self.last_output = joined_output
+                self.last_output = joined_output
 
         self.update_event.clear()
 
@@ -127,7 +129,8 @@ class DwlbUpdater(Updater):
         joined_output = self.assemble_output()
 
         if joined_output != self.last_output:
-            print(joined_output, flush=True)  # noqa: T201
-            self.last_output = joined_output
+            with contextlib.suppress(BrokenPipeError):
+                print(joined_output, flush=True)  # noqa: T201
+                self.last_output = joined_output
 
         self.update_event.clear()
