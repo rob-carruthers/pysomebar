@@ -5,6 +5,7 @@ import contextlib
 import os
 import signal
 import sys
+from pathlib import Path
 
 from pysomebar.config import CONFIG
 
@@ -20,6 +21,23 @@ from .module import (
     TempModule,
 )
 from .updater import DwlbUpdater, SomebarUpdater
+
+PID_FILE = "pysomebar.pid"
+
+
+def write_pid_file() -> Path:
+    """Write file containing current PID to XDG_RUNTIME_DIR."""
+    pid = os.getpid()
+    pid_path = Path(os.environ["XDG_RUNTIME_DIR"]) / PID_FILE
+
+    if pid_path.exists():
+        msg = "PID file exists - is another instance running?"
+        raise RuntimeError(msg)
+
+    with pid_path.open("w") as f:
+        f.write(str(pid))
+
+    return pid_path
 
 
 async def main_loop() -> None:
@@ -70,8 +88,12 @@ async def main_loop() -> None:
 
 def main() -> None:  # noqa: D103
     # Safety net - broken pipe is handled in write_output()
-    with contextlib.suppress(KeyboardInterrupt, BrokenPipeError):
-        asyncio.run(main_loop())
+    pid_path = write_pid_file()
+    try:
+        with contextlib.suppress(KeyboardInterrupt, BrokenPipeError):
+            asyncio.run(main_loop())
+    finally:
+        pid_path.unlink(missing_ok=True)
 
     devnull = os.open(os.devnull, os.O_WRONLY)
     os.dup2(devnull, sys.stdout.fileno())
