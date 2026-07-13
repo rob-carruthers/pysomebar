@@ -64,13 +64,13 @@ class NetworkModule(Module):
         try:
             new_recv, new_sent = self.get_counts()
         except ValueError:
-            self.output = f"{self.recv_icon}: ?/s {self.sent_icon}: ?/s"
+            self.output = f"{self.recv_icon} ?/s {self.sent_icon} ?/s"
             return
 
         rate_recv = self.get_rate_formatted(new_recv, self.recv)
         rate_sent = self.get_rate_formatted(new_sent, self.sent)
 
-        self.output = f"{self.recv_icon}: {rate_recv} {self.sent_icon}: {rate_sent}"
+        self.output = f"{self.recv_icon} {rate_recv} {self.sent_icon} {rate_sent}"
         self.recv, self.sent = new_recv, new_sent
 
         if CONFIG.bar_type == "dwlb":
