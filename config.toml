@@ -1,4 +1,5 @@
 bar_type = "dwlb"
+modules = ["mpd", "memory", "pulse", "temp", "pacman", "date"]
 base_color = "white0"
 separator = " | "
 separator_color = "white0"

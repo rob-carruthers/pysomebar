@@ -117,6 +117,7 @@ class Config(BaseModel):
     """Top-level config."""
 
     bar_type: BarType = "somebar"
+    modules: list[str] = ["date"]
     base_color: str = "#ffffff"
     separator: str = " | "
     separator_color: str = "#ffffff"

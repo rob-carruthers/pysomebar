@@ -9,19 +9,8 @@ from pathlib import Path
 
 from pysomebar.config import CONFIG
 
-from .module import (
-    BatteryModule,
-    BrightnessModule,
-    DateModule,
-    MemoryModule,
-    Module,
-    MPDModule,
-    PacmanModule,
-    PortageModule,
-    PulseModule,
-    TempModule,
-)
-from .updater import DwlbUpdater, SomebarUpdater
+from .module import Module
+from .updater import DwlbUpdater, SomebarUpdater, Updater
 
 PID_FILE = "pysomebar.pid"
 
@@ -41,6 +30,29 @@ def write_pid_file() -> Path:
     return pid_path
 
 
+async def instantiate_modules(updater: Updater) -> None:
+    """Instantiate modules in `updater` using ordered list from config."""
+    available_modules: dict[str, type[Module]] = {}
+    for module_cls in Module.__subclasses__():
+        # Check for duplicated name (for new/development modules)
+        if module_cls.name in available_modules:
+            existing = available_modules[module_cls.name]
+            msg = (
+                f"Duplicate module name {module_cls.name!r}: "
+                f"used by both {existing.__name__} and {module_cls.__name__}"
+            )
+            raise ValueError(msg)
+
+        available_modules[module_cls.name] = module_cls
+
+    for module_name in CONFIG.modules:
+        if module_name not in available_modules:
+            msg = f"Module `{module_name}` unrecognised."
+            raise ValueError(msg)
+        module_cls = available_modules[module_name]
+        await updater.add_module(module_cls())
+
+
 async def main_loop() -> None:
     """Start main async loop."""
     # Set an event handler for SIGPIPE if using piped stdout - shutdown if the pipe is destroyed
@@ -54,15 +66,7 @@ async def main_loop() -> None:
         case "dwlb":
             updater = DwlbUpdater()
 
-    await updater.add_module(MPDModule())
-    await updater.add_module(MemoryModule())
-    await updater.add_module(PulseModule())
-    await updater.add_module(BrightnessModule())
-    await updater.add_module(TempModule())
-    await updater.add_module(BatteryModule())
-    await updater.add_module(PacmanModule())
-    await updater.add_module(PortageModule())
-    await updater.add_module(DateModule())
+    await instantiate_modules(updater)
 
     signal_groups: dict[int, list[Module]] = {}
     for module in updater.modules:
