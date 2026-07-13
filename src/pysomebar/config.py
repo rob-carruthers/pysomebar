@@ -89,6 +89,13 @@ class PulseModuleConfig(ModuleConfig):
     mute_color: str = "white"
 
 
+class MPDModuleConfig(ModuleConfig):
+    """Config for MPD module."""
+
+    host: str = "localhost"
+    port: int = 6600
+
+
 class TempModuleConfig(ModuleConfig):
     """Config for temp module.
 
@@ -121,6 +128,7 @@ class Config(BaseModel):
     brightness: BrightnessModuleConfig = BrightnessModuleConfig()
     date: DateModuleConfig = DateModuleConfig()
     pulse: PulseModuleConfig = PulseModuleConfig()
+    mpd: MPDModuleConfig = MPDModuleConfig()
     pacman: PacmanModuleConfig = PacmanModuleConfig()
     portage: PortageModuleConfig = PortageModuleConfig()
     temp: TempModuleConfig = TempModuleConfig()

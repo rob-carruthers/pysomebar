@@ -48,6 +48,12 @@ enabled = true
 interval = 300
 mute_color = "gray5"
 
+[mpd]
+enabled = true
+interval = 10
+host = "localhost"
+port = 6600
+
 [temp]
 enabled = true
 interval = 5

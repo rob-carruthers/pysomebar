@@ -15,6 +15,7 @@ from .module import (
     DateModule,
     MemoryModule,
     Module,
+    MPDModule,
     PacmanModule,
     PortageModule,
     PulseModule,
@@ -53,6 +54,7 @@ async def main_loop() -> None:
         case "dwlb":
             updater = DwlbUpdater()
 
+    await updater.add_module(MPDModule())
     await updater.add_module(MemoryModule())
     await updater.add_module(PulseModule())
     await updater.add_module(BrightnessModule())

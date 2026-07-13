@@ -10,6 +10,7 @@ dependencies = [
   "psutil",
   "pulsectl-asyncio",
   "pydantic",
+  "python-mpd2",
   "xdg-base-dirs",
 ]
 
