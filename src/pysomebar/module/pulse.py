@@ -90,7 +90,7 @@ class PulseModule(Module):
                 await self.connect()
                 break
             except PulseError:
-                await asyncio.sleep(0.5)
+                await asyncio.sleep(CONFIG.try_reconnect_interval)
 
         else:
             self.output = "connection error"

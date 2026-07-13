@@ -92,7 +92,7 @@ class SomebarUpdater(Updater):
         for _ in range(retries):
             if self.somebar.exists():
                 break
-            time.sleep(0.5)
+            time.sleep(CONFIG.try_reconnect_interval)
         else:
             raise FileNotFoundError
 

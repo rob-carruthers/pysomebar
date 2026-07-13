@@ -115,6 +115,7 @@ class Config(BaseModel):
     separator_color: str = "#ffffff"
     edge_padding: int = 0
     colors: dict[str, str] = {"white": "#ffffff"}
+    try_reconnect_interval: float = 0.5
     battery: BatteryModuleConfig = BatteryModuleConfig()
     memory: MemoryModuleConfig = MemoryModuleConfig()
     brightness: BrightnessModuleConfig = BrightnessModuleConfig()
