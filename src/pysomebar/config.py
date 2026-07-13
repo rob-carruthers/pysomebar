@@ -57,6 +57,25 @@ class BrightnessModuleConfig(ModuleConfig):
     device: str | None = None
 
 
+class NetworkModuleConfig(ModuleConfig):
+    """Config for network module.
+
+    Attributes
+    ----------
+    device : str | None, default None
+        Network device to return rates from. If `None`, use totals for all interfaces.
+    padding : int, default 8
+        Number of characters with which to justify using whitespace to avoid excess movement.
+    gate : int, default 0
+        Number of bytes below which rate is reported as '0', to avoid distaction.
+
+    """
+
+    device: str | None = None
+    padding: int = 8
+    gate: int = 0
+
+
 class DateModuleConfig(ModuleConfig):
     """Config for the date/time module.
 
@@ -127,6 +146,7 @@ class Config(BaseModel):
     battery: BatteryModuleConfig = BatteryModuleConfig()
     memory: MemoryModuleConfig = MemoryModuleConfig()
     brightness: BrightnessModuleConfig = BrightnessModuleConfig()
+    network: NetworkModuleConfig = NetworkModuleConfig()
     date: DateModuleConfig = DateModuleConfig()
     pulse: PulseModuleConfig = PulseModuleConfig()
     mpd: MPDModuleConfig = MPDModuleConfig()
