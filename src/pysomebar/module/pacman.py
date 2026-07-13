@@ -11,8 +11,10 @@ from .module import Module
 class PacmanModule(Module):
     """Module for printing date/time."""
 
+    name = "pacman"
+
     def __init__(self) -> None:  # noqa: D107
-        super().__init__(CONFIG.pacman.interval)
+        super().__init__(name=self.name, interval=CONFIG.pacman.interval)
 
         self.enabled = CONFIG.pacman.enabled
         self.refresh_signal = 1

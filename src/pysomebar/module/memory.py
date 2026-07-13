@@ -33,8 +33,10 @@ def format_bytes(b: float, base: int = 1024) -> str:
 class MemoryModule(Module):
     """Module for showing current used memory."""
 
+    name = "memory"
+
     def __init__(self) -> None:  # noqa: D107
-        super().__init__(CONFIG.memory.interval)
+        super().__init__(name=self.name, interval=CONFIG.memory.interval)
 
         self.enabled = CONFIG.memory.enabled
 

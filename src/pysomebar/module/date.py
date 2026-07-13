@@ -10,8 +10,10 @@ from .module import Module
 class DateModule(Module):
     """Module for printing date/time."""
 
+    name = "date"
+
     def __init__(self) -> None:  # noqa: D107
-        super().__init__(CONFIG.date.interval)
+        super().__init__(name=self.name, interval=CONFIG.date.interval)
 
         self.enabled = CONFIG.date.enabled
 

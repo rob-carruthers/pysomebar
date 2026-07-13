@@ -13,8 +13,10 @@ from .module import Module
 class BrightnessModule(Module):
     """Module for monitoring brightness via /sys/class/backlight/."""
 
+    name = "brightness"
+
     def __init__(self) -> None:  # noqa: D107
-        super().__init__(CONFIG.brightness.interval)
+        super().__init__(name=self.name, interval=CONFIG.brightness.interval)
 
         self.enabled = CONFIG.brightness.enabled
         self.do_initial_update = False

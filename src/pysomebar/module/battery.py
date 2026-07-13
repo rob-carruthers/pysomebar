@@ -21,6 +21,7 @@ def convert_time(seconds: int) -> str:
 class BatteryModule(Module):
     """Module for showing battery status and calculating remaining time."""
 
+    name = "battery"
     charging_icons = MappingProxyType(
         {
             0: "󰢟",
@@ -60,7 +61,7 @@ class BatteryModule(Module):
     )
 
     def __init__(self) -> None:  # noqa: D107
-        super().__init__(CONFIG.battery.interval)
+        super().__init__(name=self.name, interval=CONFIG.battery.interval)
 
         self.enabled = CONFIG.battery.enabled
 

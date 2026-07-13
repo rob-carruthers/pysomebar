@@ -15,11 +15,13 @@ from .module import Module
 class PulseModule(Module):
     """Module for monitoring volume via Pulseaudio API."""
 
+    name = "pulse"
+
     vol_muted_icon = ""
     vol_icons = MappingProxyType({70: "", 40: "", -1: ""})
 
     def __init__(self) -> None:  # noqa: D107
-        super().__init__(CONFIG.pulse.interval)
+        super().__init__(name=self.name, interval=CONFIG.pulse.interval)
 
         self.enabled = CONFIG.pulse.enabled
         self.do_initial_update = False

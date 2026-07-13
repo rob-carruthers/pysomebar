@@ -14,8 +14,10 @@ from .module import Module
 class PortageModule(Module):
     """Module for printing date/time."""
 
+    name = "portage"
+
     def __init__(self, spinner: str = "Syncing portage...") -> None:  # noqa: D107
-        super().__init__(CONFIG.portage.interval)
+        super().__init__(name=self.name, interval=CONFIG.portage.interval)
 
         self.enabled = CONFIG.portage.enabled
         self.do_initial_update = False

@@ -17,7 +17,10 @@ if TYPE_CHECKING:
 class Module(ABC):
     """Abstract base class for modules."""
 
-    def __init__(self, interval: int) -> None:  # noqa: D107
+    name: str
+
+    def __init__(self, name: str = "", interval: int = 10) -> None:  # noqa: D107
+        self.name = name
         self.updater: Updater | None = None
         self.interval = interval
         self.do_initial_update = True

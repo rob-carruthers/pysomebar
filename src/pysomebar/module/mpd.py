@@ -65,8 +65,10 @@ class MPDStatus:
 class MPDModule(Module):
     """Module for monitoring MPD."""
 
+    name = "mpd"
+
     def __init__(self) -> None:  # noqa: D107
-        super().__init__(CONFIG.mpd.interval)
+        super().__init__(name=self.name, interval=CONFIG.mpd.interval)
 
         self.enabled = CONFIG.mpd.enabled
         self.do_initial_update = False

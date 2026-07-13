@@ -21,6 +21,8 @@ def convert_time(seconds: int) -> str:
 class TempModule(Module):
     """Module for showing temps."""
 
+    name = "temp"
+
     icons = MappingProxyType({75: "", 60: "", 50: "", -274: ""})
     colors = MappingProxyType(
         {
@@ -31,7 +33,7 @@ class TempModule(Module):
     )
 
     def __init__(self) -> None:  # noqa: D107
-        super().__init__(CONFIG.temp.interval)
+        super().__init__(name=self.name, interval=CONFIG.temp.interval)
 
         self.enabled = CONFIG.temp.enabled
 
