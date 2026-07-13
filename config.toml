@@ -17,6 +17,11 @@ magenta = "#b48ead"
 enabled = true
 interval = 10
 
+[network]
+enabled = true
+interval = 2
+device = "enp6s0"
+
 [battery]
 enabled = true
 interval = 10
