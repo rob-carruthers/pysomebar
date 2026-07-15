@@ -32,7 +32,7 @@ class CPUModuleConfig(ModuleConfig):
 
     Attributes
     ----------
-    yellow_threshold : int, default 60
+    yellow_threshold : int, default 50
         Display status as yellow >= `yellow_threshold`.
     red_threshold : int, default 75
         Display status as red >= `red_threshold`.
