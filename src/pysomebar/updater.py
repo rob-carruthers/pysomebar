@@ -36,9 +36,6 @@ class Updater(ABC):
 
     async def add_module(self, module: Module) -> None:
         """Add a module to this updater."""
-        if not module.enabled:
-            return
-
         module.updater = self
         self.tasks.add(asyncio.create_task(module.loop()))
         self.modules.append(module)

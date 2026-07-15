@@ -14,53 +14,43 @@ gray5 = "#60728a"
 magenta = "#b48ead"
 
 [memory]
-enabled = true
 interval = 10
 
 [network]
-enabled = true
 interval = 2
 device = "enp6s0"
 
 [battery]
-enabled = true
 interval = 10
 green_threshold = 30
 yellow_threshold = 20
 
 [brightness]
-enabled = true
 interval = 5
 device = "nvidia_wmi_ec_backlight"
 
 [date]
-enabled = true
 interval = 5
 format = "%d/%m/%Y %H:%M"
 
 [pacman]
-enabled = true
 interval = 3600
 available_updates_color = "magenta"
 
 [portage]
-enabled = true
 interval = 3600
 watch_file = "/var/cache/eix/portage.eix"
 available_updates_color = "magenta"
 
 [pulse]
-enabled = true
 interval = 300
 mute_color = "gray5"
 
 [mpd]
-enabled = true
 interval = 10
 host = "localhost"
 port = 6600
 
 [temp]
-enabled = true
 interval = 5
 device = "k10temp"

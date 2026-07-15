@@ -15,13 +15,8 @@ class DateModule(Module):
     def __init__(self) -> None:  # noqa: D107
         super().__init__(name=self.name, interval=CONFIG.date.interval)
 
-        self.enabled = CONFIG.date.enabled
-
     async def update(self) -> None:
         """Update output with current date/time in chosen format."""
-        if not self.enabled:
-            return
-
         now = datetime.datetime.now().astimezone().strftime(CONFIG.date.format)
         self.output = now
         if self.updater is not None:

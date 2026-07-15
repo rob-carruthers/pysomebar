@@ -15,16 +15,8 @@ BarType = Literal["somebar", "dwlb"]
 
 
 class ModuleConfig(BaseModel):
-    """Config for a module.
+    """Config for a module."""
 
-    Attributes
-    ----------
-    enabled : bool, default False
-        Whether a module should be enabled.
-
-    """
-
-    enabled: bool = False
     interval: int = 5
 
 

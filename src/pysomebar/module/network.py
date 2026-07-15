@@ -18,7 +18,6 @@ class NetworkModule(Module):
     def __init__(self) -> None:  # noqa: D107
         super().__init__(name=self.name, interval=CONFIG.network.interval)
 
-        self.enabled = CONFIG.network.enabled
         self.device = CONFIG.network.device
         self.padding = CONFIG.network.padding
         self.gate = CONFIG.network.gate
@@ -57,9 +56,6 @@ class NetworkModule(Module):
 
     async def update(self) -> None:
         """Update output with current battery status."""
-        if not self.enabled:
-            return
-
         # Output gracefully if configured network device suddenly isn't available
         try:
             new_recv, new_sent = self.get_counts()

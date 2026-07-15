@@ -27,7 +27,6 @@ class Module(ABC):
         self.interval = interval
         self.do_initial_update = True
         self.output: str = ""
-        self.enabled: bool = False
         self.refresh_signal: int | None = None
         self.refresh_event = asyncio.Event()
 
@@ -42,9 +41,6 @@ class Module(ABC):
 
     async def loop(self) -> None:
         """Loop over interval/async updates."""
-        if not self.enabled:
-            return
-
         while True:
             try:
                 await asyncio.wait_for(self.update(), timeout=self.interval)

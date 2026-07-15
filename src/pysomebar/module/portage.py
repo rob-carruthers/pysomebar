@@ -19,7 +19,6 @@ class PortageModule(Module):
     def __init__(self, spinner: str = "Syncing portage...") -> None:  # noqa: D107
         super().__init__(name=self.name, interval=CONFIG.portage.interval)
 
-        self.enabled = CONFIG.portage.enabled
         self.do_initial_update = False
         self.spinner = spinner
         self._lock = asyncio.Lock()
@@ -63,9 +62,6 @@ class PortageModule(Module):
 
     async def loop(self) -> None:
         """Update output with current n updates.."""
-        if not self.enabled:
-            return
-
         await self.make_output()
 
         async for _ in self.watch_files(

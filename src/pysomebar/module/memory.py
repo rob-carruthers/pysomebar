@@ -21,13 +21,8 @@ class MemoryModule(Module):
     def __init__(self) -> None:  # noqa: D107
         super().__init__(name=self.name, interval=CONFIG.memory.interval)
 
-        self.enabled = CONFIG.memory.enabled
-
     async def update(self) -> None:
         """Update output with current battery status."""
-        if not self.enabled:
-            return
-
         mem: svmem = psutil.virtual_memory()
 
         # Matching htop's calculation of 'used' mem

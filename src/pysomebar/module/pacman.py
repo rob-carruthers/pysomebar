@@ -16,13 +16,9 @@ class PacmanModule(NeedsInternetModule):
     def __init__(self) -> None:  # noqa: D107
         super().__init__(name=self.name, interval=CONFIG.pacman.interval)
 
-        self.enabled = CONFIG.pacman.enabled
         self.refresh_signal = 1
 
     async def update(self) -> None:  # noqa: D102
-        if not self.enabled:
-            return
-
         await self.make_output()
 
     async def get_n_updates(self) -> int:

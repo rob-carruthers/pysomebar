@@ -63,8 +63,6 @@ class BatteryModule(Module):
     def __init__(self) -> None:  # noqa: D107
         super().__init__(name=self.name, interval=CONFIG.battery.interval)
 
-        self.enabled = CONFIG.battery.enabled
-
     def get_icon(self, percent: float, *, is_charging: bool = False) -> str:
         """Retrieve an appropriate icon from self.(dis)charging_icons."""
         rounded = int((percent // 10) * 10)
@@ -88,9 +86,6 @@ class BatteryModule(Module):
 
     async def update(self) -> None:
         """Update output with current battery status."""
-        if not self.enabled:
-            return
-
         battery = psutil.sensors_battery()
         is_charging = battery.power_plugged is True
         self.output = self.make_output(battery.percent, battery.secsleft, is_charging=is_charging)

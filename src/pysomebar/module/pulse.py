@@ -23,7 +23,6 @@ class PulseModule(Module):
     def __init__(self) -> None:  # noqa: D107
         super().__init__(name=self.name, interval=CONFIG.pulse.interval)
 
-        self.enabled = CONFIG.pulse.enabled
         self.do_initial_update = False
         self.pulse = pulsectl_asyncio.PulseAsync("pysomebar-pulse")
         self.connect_retries = 10
@@ -84,9 +83,6 @@ class PulseModule(Module):
 
     async def loop(self) -> None:
         """Update output with current date/time in chosen format."""
-        if not self.enabled:
-            return
-
         for _ in range(self.connect_retries):
             try:
                 await self.connect()

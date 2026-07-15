@@ -70,7 +70,6 @@ class MPDModule(Module):
     def __init__(self) -> None:  # noqa: D107
         super().__init__(name=self.name, interval=CONFIG.mpd.interval)
 
-        self.enabled = CONFIG.mpd.enabled
         self.do_initial_update = False
         self.client = MPDClient()
         self.connect_retries = 10
@@ -112,9 +111,6 @@ class MPDModule(Module):
 
     async def loop(self) -> None:
         """Update output with current date/time in chosen format."""
-        if not self.enabled:
-            return
-
         while True:
             if not await self.ensure_connected():
                 self.output = "connection error"

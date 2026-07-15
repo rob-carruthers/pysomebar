@@ -18,7 +18,6 @@ class BrightnessModule(Module):
     def __init__(self) -> None:  # noqa: D107
         super().__init__(name=self.name, interval=CONFIG.brightness.interval)
 
-        self.enabled = CONFIG.brightness.enabled
         self.do_initial_update = False
 
     async def update(self) -> None:
@@ -26,7 +25,7 @@ class BrightnessModule(Module):
 
     async def get_brightness(self) -> int | None:
         """Retrieve brightness % from /sys/class/backlight/."""
-        if not self.enabled or CONFIG.brightness.device is None:
+        if CONFIG.brightness.device is None:
             return None
 
         backlight_dir = Path("/sys/class/backlight") / CONFIG.brightness.device
@@ -47,7 +46,7 @@ class BrightnessModule(Module):
 
     async def loop(self) -> None:
         """Update output with current date/time in chosen format."""
-        if not self.enabled or CONFIG.brightness.device is None:
+        if CONFIG.brightness.device is None:
             return
 
         brightness_file = Path("/sys/class/backlight") / CONFIG.brightness.device / "brightness"

@@ -35,13 +35,8 @@ class TempModule(Module):
     def __init__(self) -> None:  # noqa: D107
         super().__init__(name=self.name, interval=CONFIG.temp.interval)
 
-        self.enabled = CONFIG.temp.enabled
-
     async def update(self) -> None:
         """Update output with current date/time in chosen format."""
-        if not self.enabled:
-            return
-
         temp = round(float(psutil.sensors_temperatures()[CONFIG.temp.device][0].current))
 
         icon = next(icon for thresh, icon in self.icons.items() if temp >= thresh)
