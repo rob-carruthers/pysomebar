@@ -21,35 +21,49 @@ class PacmanModule(NeedsInternetModule):
     async def update(self) -> None:  # noqa: D102
         await self.make_output()
 
-    async def get_n_updates(self) -> int:
-        """Get the number of portage updates available by running `emerge -NupDq world`."""
-        proc = await asyncio.create_subprocess_exec(
-            "/usr/bin/checkupdates",
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.DEVNULL,
-        )
-        stdout, _ = await proc.communicate()
-        if not stdout:
+    async def get_n_updates(self) -> int | None:
+        """Return update count, or None if checkupdates couldn't run/sync."""
+        no_updates = 2
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                "/usr/bin/checkupdates",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.DEVNULL,
+            )
+            stdout, _ = await asyncio.wait_for(proc.communicate(), timeout=30)
+        except TimeoutError:
+            proc.kill()
+            await proc.wait()
+            return None
+        except OSError:
+            return None
+
+        if proc.returncode == no_updates:
             return 0
+        if proc.returncode != 0:
+            return None
 
-        lines = [line for line in stdout.decode().split("\n") if line]
-
-        return len(lines)
+        return len([line for line in stdout.decode().split("\n") if line])
 
     async def make_output(self) -> None:
         """Set 'spinner', get `n_updates` and update status."""
+        self.output = "Updating..."
         if self.updater is not None:
             self.updater.update_event.set()
 
         n_updates = await self.get_n_updates()
 
-        self.output = f"Updates: {n_updates}" if n_updates > 0 else "No updates"
-
-        if CONFIG.bar_type == "dwlb" and n_updates > 0:
-            self.output = make_dwlb_colored_text(
-                self.output,
-                fg=CONFIG.portage.available_updates_color,
-            )
+        if n_updates is None:
+            self.output = "No network!"
+        elif n_updates > 0:
+            self.output = f"Updates: {n_updates}"
+            if CONFIG.bar_type == "dwlb":
+                self.output = make_dwlb_colored_text(
+                    self.output,
+                    fg=CONFIG.pacman.available_updates_color,
+                )
+        else:
+            self.output = "No updates"
 
         if self.updater is not None:
             self.updater.update_event.set()
