@@ -5,10 +5,10 @@ import asyncio
 from pysomebar.config import CONFIG
 from pysomebar.util import make_dwlb_colored_text
 
-from .module import Module
+from .module import NeedsInternetModule
 
 
-class PacmanModule(Module):
+class PacmanModule(NeedsInternetModule):
     """Module for printing date/time."""
 
     name = "pacman"
