@@ -30,8 +30,17 @@ class MemoryModuleConfig(ModuleConfig):
 class CPUModuleConfig(ModuleConfig):
     """Config for CPU module.
 
-    Currently no additonal options.
+    Attributes
+    ----------
+    yellow_threshold : int, default 60
+        Display status as yellow >= `yellow_threshold`.
+    red_threshold : int, default 75
+        Display status as red >= `red_threshold`.
+
     """
+
+    yellow_threshold: int = 50
+    red_threshold: int = 75
 
 
 class BatteryModuleConfig(ModuleConfig):
