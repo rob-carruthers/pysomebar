@@ -93,16 +93,22 @@ class NeedsInternetModule(Module, ABC):
 
     name: str
 
-    def __init__(self, name: str = "", interval: int = 10, connect_retries: int = 10) -> None:  # noqa: D107
+    def __init__(  # noqa: D107
+        self,
+        name: str = "",
+        interval: int = 10,
+        retry_interval: float = 1.0,
+        connect_retries: int = 1,
+    ) -> None:
         self.name = name
         super().__init__(name=name, interval=interval)
 
         for _ in range(connect_retries):
             if self.is_internet_available():
                 break
-            time.sleep(0.5)
+            time.sleep(retry_interval)
         else:
-            raise ConnectionError
+            self.output = "No network!"
 
     def is_internet_available(  # noqa: D102
         self,
