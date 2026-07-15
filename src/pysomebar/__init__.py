@@ -2,6 +2,7 @@
 
 import asyncio
 import contextlib
+import inspect
 import os
 import signal
 import sys
@@ -30,10 +31,19 @@ def write_pid_file() -> Path:
     return pid_path
 
 
+def _all_concrete_subclasses(cls: type[Module]) -> set[type[Module]]:
+    result = set()
+    for sub in cls.__subclasses__():
+        if not inspect.isabstract(sub):
+            result.add(sub)
+        result |= _all_concrete_subclasses(sub)
+    return result
+
+
 async def instantiate_modules(updater: Updater) -> None:
     """Instantiate modules in `updater` using ordered list from config."""
     available_modules: dict[str, type[Module]] = {}
-    for module_cls in Module.__subclasses__():
+    for module_cls in _all_concrete_subclasses(Module):
         # Check for duplicated name (for new/development modules)
         if module_cls.name in available_modules:
             existing = available_modules[module_cls.name]
