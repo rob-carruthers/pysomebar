@@ -2,6 +2,8 @@
 
 import asyncio
 import contextlib
+import socket
+import time
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -85,3 +87,40 @@ class Module(ABC):
                     continue
                 if event.path in watch_files_ or event.path.parent in watch_dirs:
                     yield event
+
+
+class NeedsInternetModule(Module, ABC):
+    """A module which requires an internet connection upon loading to function.
+
+    E.g. checking a package repository for updates.
+    """
+
+    name: str
+
+    def __init__(self, name: str = "", interval: int = 10, connect_retries: int = 10) -> None:  # noqa: D107
+        self.name = name
+        super().__init__(name=name, interval=interval)
+
+        for _ in range(connect_retries):
+            if self.is_internet_available():
+                break
+            time.sleep(0.5)
+        else:
+            raise ConnectionError
+
+    def is_internet_available(  # noqa: D102
+        self,
+        host: str = "8.8.8.8",
+        port: int = 53,
+        timeout: int = 3,
+    ) -> bool:
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                sock.settimeout(timeout)
+                sock.connect((host, port))
+
+        except OSError:
+            return False
+
+        else:
+            return True
