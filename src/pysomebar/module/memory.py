@@ -34,5 +34,4 @@ class MemoryModule(Module):
         if CONFIG.bar_type == "dwlb":
             self.output = make_dwlb_colored_text(self.output, fg=CONFIG.base_color)
 
-        if self.updater is not None:
-            self.updater.update_event.set()
+        await self.request_redraw()

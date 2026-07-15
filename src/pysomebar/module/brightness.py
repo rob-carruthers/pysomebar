@@ -41,8 +41,7 @@ class BrightnessModule(Module):
         """Make output from brightness percent."""
         self.output = f"󰍹 {brightness_percent}%"
 
-        if self.updater is not None:
-            self.updater.update_event.set()
+        await self.request_redraw()
 
     async def loop(self) -> None:
         """Update output with current date/time in chosen format."""

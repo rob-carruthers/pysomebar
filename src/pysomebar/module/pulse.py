@@ -78,8 +78,7 @@ class PulseModule(Module):
         if CONFIG.bar_type == "dwlb" and self.current_muted:
             self.output = make_dwlb_colored_text(self.output, fg=CONFIG.pulse.mute_color)
 
-        if self.updater is not None:
-            self.updater.update_event.set()
+        await self.request_redraw()
 
     async def loop(self) -> None:
         """Update output with current date/time in chosen format."""
@@ -92,8 +91,7 @@ class PulseModule(Module):
 
         else:
             self.output = "connection error"
-            if self.updater is not None:
-                self.updater.update_event.set()
+            await self.request_redraw()
             raise ConnectionError
 
         self.current_volume, self.current_muted = await self.get_volume()

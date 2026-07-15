@@ -19,5 +19,4 @@ class DateModule(Module):
         """Update output with current date/time in chosen format."""
         now = datetime.datetime.now().astimezone().strftime(CONFIG.date.format)
         self.output = now
-        if self.updater is not None:
-            self.updater.update_event.set()
+        await self.request_redraw()

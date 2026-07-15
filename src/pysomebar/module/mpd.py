@@ -93,8 +93,7 @@ class MPDModule(Module):
         else:
             self.output = f"{status.state_icon} {status.artist} - {status.title}"
 
-        if self.updater is not None:
-            self.updater.update_event.set()
+        await self.request_redraw()
 
     async def ensure_connected(self) -> bool:
         """Try to (re)connect to MPD, retrying with backoff. Returns True on success."""
@@ -114,8 +113,7 @@ class MPDModule(Module):
         while True:
             if not await self.ensure_connected():
                 self.output = "connection error"
-                if self.updater is not None:
-                    self.updater.update_event.set()
+                await self.request_redraw()
                 await asyncio.sleep(self.interval)
                 continue
 

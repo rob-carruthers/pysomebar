@@ -44,8 +44,7 @@ class PortageModule(Module):
         """Set 'spinner', get `n_updates` and update status."""
         async with self._lock:
             self.output = self.spinner
-            if self.updater is not None:
-                self.updater.update_event.set()
+            await self.request_redraw()
 
             n_updates = await self.get_n_updates()
 
@@ -57,8 +56,7 @@ class PortageModule(Module):
                 fg=CONFIG.portage.available_updates_color,
             )
 
-        if self.updater is not None:
-            self.updater.update_event.set()
+        await self.request_redraw()
 
     async def loop(self) -> None:
         """Update output with current n updates.."""

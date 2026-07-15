@@ -34,6 +34,10 @@ class Module(ABC):
         """Signal this module to refresh immediately, bypassing its interval wait."""
         self.refresh_event.set()
 
+    async def request_redraw(self) -> None:
+        if self.updater is not None:
+            await self.updater.update_queue.put(self)
+
     @abstractmethod
     async def update(self) -> None:
         """Abstract method for updating asynchronously."""

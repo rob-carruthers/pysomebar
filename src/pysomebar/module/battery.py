@@ -95,5 +95,4 @@ class BatteryModule(Module):
             color = next(color for thresh, color in self.colors.items() if rounded >= thresh)
             self.output = make_dwlb_colored_text(self.output, fg=color)
 
-        if self.updater is not None:
-            self.updater.update_event.set()
+        await self.request_redraw()

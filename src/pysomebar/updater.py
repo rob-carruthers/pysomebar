@@ -31,7 +31,7 @@ class Updater(ABC):
         self.modules: list[Module] = []
         self.output: str = ""
         self.last_output: str = ""
-        self.update_event = asyncio.Event()
+        self.update_queue: asyncio.Queue[Module] = asyncio.Queue()
         self.tasks: set[asyncio.Task] = set()
 
     async def add_module(self, module: Module) -> None:
@@ -62,14 +62,26 @@ class Updater(ABC):
 
         await self.write_output()
 
-    async def loop(self) -> None:
-        """Continuously wait for updates/interval timeouts and write to named pipe."""
+    async def loop(self, debounce_s: float = 0.05) -> None:
+        """Continuously wait for updates/interval timeouts and write to named pipe.
+
+        Parameters
+        ----------
+        debounce_s : float, default = 0.05
+            Interval in seconds to wait for other redraw requests, before firing just one regardless
+            of how many were received in the interval.
+
+        """
         if len(self.modules) < 1:
             return
 
         while True:
-            await self.update_event.wait()
-            await asyncio.sleep(0)
+            await self.update_queue.get()
+            while True:
+                try:
+                    await asyncio.wait_for(self.update_queue.get(), timeout=debounce_s)
+                except asyncio.TimeoutError:
+                    break
             await self.write_output()
 
 
@@ -105,8 +117,6 @@ class SomebarUpdater(Updater):
 
                 self.last_output = joined_output
 
-        self.update_event.clear()
-
 
 class DwlbUpdater(Updater):
     """Updater for `dwlb`.
@@ -129,5 +139,3 @@ class DwlbUpdater(Updater):
             with contextlib.suppress(BrokenPipeError):
                 print(joined_output, flush=True)  # noqa: T201
                 self.last_output = joined_output
-
-        self.update_event.clear()

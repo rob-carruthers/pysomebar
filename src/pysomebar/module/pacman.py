@@ -48,8 +48,7 @@ class PacmanModule(NeedsInternetModule):
     async def make_output(self) -> None:
         """Set 'spinner', get `n_updates` and update status."""
         self.output = "Updating..."
-        if self.updater is not None:
-            self.updater.update_event.set()
+        await self.request_redraw()
 
         n_updates = await self.get_n_updates()
 
@@ -65,5 +64,4 @@ class PacmanModule(NeedsInternetModule):
         else:
             self.output = "No updates"
 
-        if self.updater is not None:
-            self.updater.update_event.set()
+        await self.request_redraw()
