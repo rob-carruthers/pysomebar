@@ -27,6 +27,13 @@ class MemoryModuleConfig(ModuleConfig):
     """
 
 
+class CPUModuleConfig(ModuleConfig):
+    """Config for CPU module.
+
+    Currently no additonal options.
+    """
+
+
 class BatteryModuleConfig(ModuleConfig):
     """Config for battery module.
 
@@ -137,6 +144,7 @@ class Config(BaseModel):
     try_reconnect_interval: float = 0.5
     battery: BatteryModuleConfig = BatteryModuleConfig()
     memory: MemoryModuleConfig = MemoryModuleConfig()
+    cpu: CPUModuleConfig = CPUModuleConfig()
     brightness: BrightnessModuleConfig = BrightnessModuleConfig()
     network: NetworkModuleConfig = NetworkModuleConfig()
     date: DateModuleConfig = DateModuleConfig()
