@@ -23,8 +23,17 @@ class ModuleConfig(BaseModel):
 class MemoryModuleConfig(ModuleConfig):
     """Config for memory module.
 
-    Currently no additonal options.
+    Attributes
+    ----------
+    yellow_threshold : int, default 50
+        Display status as yellow >= `yellow_threshold` (as % of total memory).
+    red_threshold : int, default 75
+        Display status as red >= `red_threshold` (as % of total memory).
+
     """
+
+    yellow_threshold: int = 50
+    red_threshold: int = 75
 
 
 class CPUModuleConfig(ModuleConfig):
