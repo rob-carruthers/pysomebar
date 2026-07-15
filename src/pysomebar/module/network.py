@@ -12,8 +12,8 @@ class NetworkModule(Module):
     """Module for showing current network usage."""
 
     name = "network"
-    recv_icon = ""
-    sent_icon = ""
+    recv_icon = "󰛴"
+    sent_icon = "󰛶"
 
     def __init__(self) -> None:  # noqa: D107
         super().__init__(name=self.name, interval=CONFIG.network.interval)

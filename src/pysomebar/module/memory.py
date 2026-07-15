@@ -29,7 +29,7 @@ class MemoryModule(Module):
         used_gb = format_bytes(mem.total - mem.free - mem.cached)
         available_gb = format_bytes(mem.total)
 
-        self.output = f"{used_gb} / {available_gb}"
+        self.output = f" {used_gb} / {available_gb}"
 
         if CONFIG.bar_type == "dwlb":
             self.output = make_dwlb_colored_text(self.output, fg=CONFIG.base_color)

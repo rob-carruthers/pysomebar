@@ -20,7 +20,7 @@ class CPUModule(Module):
         """Update output with current CPU usage."""
         cpu = psutil.cpu_percent()
 
-        self.output = f"{cpu}%"
+        self.output = f" {cpu}%"
 
         if CONFIG.bar_type == "dwlb":
             self.output = make_dwlb_colored_text(self.output, fg=CONFIG.base_color)
