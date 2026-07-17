@@ -29,8 +29,9 @@ class CPUModule(Module):
     async def update(self) -> None:
         """Update output with current CPU usage."""
         cpu = psutil.cpu_percent()
+        cpu = min(cpu, 99.9)
 
-        self.output = f" {cpu}%"
+        self.output = " " + f"{cpu}%".rjust(5)
 
         if CONFIG.bar_type == "dwlb":
             color = next(color for thresh, color in self.colors.items() if cpu >= thresh)
