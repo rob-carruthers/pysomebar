@@ -86,6 +86,8 @@ class Updater(ABC):
                     await asyncio.wait_for(self.update_queue.get(), timeout=debounce_s)
                 except TimeoutError:
                     break
+            if self.picostatus:
+                self.picostatus.update_event.set()
             await self.write_output()
 
 

@@ -1,3 +1,4 @@
+import contextlib
 import asyncio
 import datetime
 import json
@@ -25,6 +26,7 @@ class PicoStatusUpdater:
         self.interval = interval_secs
         self.reader: asyncio.StreamReader
         self.writer: asyncio.StreamWriter
+        self.update_event = asyncio.Event()
 
     async def connect(self):
         self.reader, self.writer = await serial_asyncio.open_serial_connection(
@@ -52,7 +54,6 @@ class PicoStatusUpdater:
         return pacman_module.raw_output
 
     def format_status(self) -> dict[PicoStatusInputDataType, dict[str, str | int]]:
-
         now = datetime.datetime.now(tz=datetime.UTC).astimezone()
         nowstr = now.strftime("%H:%M:%S")
         mpd_now_playing, state, pos, dur = self.get_mpd_data()
@@ -66,11 +67,23 @@ class PicoStatusUpdater:
 
     async def run(self) -> None:
         await self.connect()
+        last_write = 0.0
         try:
             while True:
+                now = asyncio.get_running_loop().time()
+                elapsed = now - last_write
+                if elapsed < self.interval:
+                    await asyncio.sleep(self.interval - elapsed)
+
                 line = json.dumps(self.format_status())
                 self.writer.write((line + "\n").encode())
                 await self.writer.drain()
-                await asyncio.sleep(self.interval)
+                last_write = asyncio.get_running_loop().time()
+
+                try:
+                    await asyncio.wait_for(self.update_event.wait(), timeout=self.interval)
+                    self.update_event.clear()
+                except TimeoutError:
+                    pass
         finally:
             self.writer.close()
