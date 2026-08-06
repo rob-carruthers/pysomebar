@@ -3,7 +3,6 @@
 import asyncio
 import contextlib
 import socket
-import time
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -102,31 +101,29 @@ class NeedsInternetModule(Module, ABC):
         name: str = "",
         interval: int = 10,
         retry_interval: float = 1.0,
-        connect_retries: int = 1,
+        connect_retries: int = 20,
     ) -> None:
         self.name = name
         super().__init__(name=name, interval=interval)
+        self.retry_interval = retry_interval
+        self.connect_retries = connect_retries
+        self.output = "..."
 
-        for _ in range(connect_retries):
-            if self.is_internet_available():
-                break
-            time.sleep(retry_interval)
-        else:
-            self.output = "No network!"
-
-    def is_internet_available(  # noqa: D102
+    async def is_internet_available(  # noqa: D102
         self,
         host: str = "8.8.8.8",
         port: int = 53,
-        timeout: int = 3,
     ) -> bool:
         try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                sock.settimeout(timeout)
-                sock.connect((host, port))
+            _reader, writer = await asyncio.wait_for(
+                asyncio.open_connection(host, port),
+                timeout=self.retry_interval,
+            )
 
-        except OSError:
+        except (OSError, TimeoutError):
             return False
 
         else:
+            writer.close()
+            await writer.wait_closed()
             return True
