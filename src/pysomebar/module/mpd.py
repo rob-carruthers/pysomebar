@@ -143,14 +143,19 @@ class MPDModule(Module):
                 await self.request_redraw()
                 await asyncio.sleep(self.interval)
                 continue
-
             try:
                 await self.make_output()
-                await asyncio.sleep(self.interval)
-                # async for _ in self.client.idle():
-                #     await self.make_output()
-
+                await asyncio.gather(self._idle_watch(), self._periodic_tick())
             except (ConnectionResetError, BrokenPipeError, OSError, mpd.base.MPDError):
                 with contextlib.suppress(Exception):
                     self.client.disconnect()
                 await asyncio.sleep(CONFIG.try_reconnect_interval)
+
+    async def _idle_watch(self) -> None:
+        async for _ in self.client.idle():
+            await self.make_output()
+
+    async def _periodic_tick(self) -> None:
+        while True:
+            await asyncio.sleep(self.interval)
+            await self.make_output()
