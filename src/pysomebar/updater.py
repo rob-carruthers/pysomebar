@@ -55,10 +55,11 @@ class Updater(ABC):
         if len(self.modules) < 1:
             return
 
-        for module in self.modules:
-            if not module.do_initial_update:
-                continue
-            await module.update()
+        modules_to_update = [m for m in self.modules if m.do_initial_update]
+        await asyncio.gather(
+            *(m.update() for m in modules_to_update),
+            return_exceptions=True,
+        )
 
         await self.write_output()
 
