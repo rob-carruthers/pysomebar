@@ -19,7 +19,14 @@ class PacmanModule(NeedsInternetModule):
         self.refresh_signal = 1
 
     async def update(self) -> None:  # noqa: D102
-        await self.make_output()
+        for _ in range(self.connect_retries):
+            if await self.is_internet_available():
+                await self.make_output()
+                return
+
+            await asyncio.sleep(self.retry_interval)
+
+            self.output = "No network!"
 
     async def get_n_updates(self) -> int | None:
         """Return update count, or None if checkupdates couldn't run/sync."""
