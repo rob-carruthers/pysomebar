@@ -80,7 +80,7 @@ async def main_loop() -> None:
     await instantiate_modules(updater)
 
     signal_groups: dict[int, list[Module]] = {}
-    for module in updater.modules:
+    for module in updater.modules.values():
         if module.refresh_signal is not None:
             signal_groups.setdefault(module.refresh_signal, []).append(module)
 

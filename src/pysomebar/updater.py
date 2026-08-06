@@ -29,7 +29,7 @@ class Updater(ABC):
     def __init__(self, *, picostatus: bool = False) -> None:  # noqa: D107
         self.separator = CONFIG.separator
         self.padding = CONFIG.edge_padding
-        self.modules: list[Module] = []
+        self.modules: dict[str, Module] = {}
         self.output: str = ""
         self.last_output: str = ""
         self.update_queue: asyncio.Queue[Module] = asyncio.Queue()
@@ -41,11 +41,11 @@ class Updater(ABC):
         """Add a module to this updater."""
         module.updater = self
         self.tasks.add(asyncio.create_task(module.loop()))
-        self.modules.append(module)
+        self.modules[module.name] = module
 
     def assemble_output(self) -> str:
         """Assemble output from modules."""
-        joined_output = self.separator.join(module.output for module in self.modules)
+        joined_output = self.separator.join(module.output for module in self.modules.values())
 
         return " " * self.padding + joined_output + " " * self.padding
 
@@ -58,7 +58,7 @@ class Updater(ABC):
         if len(self.modules) < 1:
             return
 
-        modules_to_update = [m for m in self.modules if m.do_initial_update]
+        modules_to_update = [m for m in self.modules.values() if m.do_initial_update]
         await asyncio.gather(
             *(m.update() for m in modules_to_update),
             return_exceptions=True,
