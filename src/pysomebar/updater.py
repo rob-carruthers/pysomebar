@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 import aiofiles
 
 from pysomebar.config import CONFIG
+from pysomebar.picostatus import PicoStatusUpdater
 from pysomebar.util import make_dwlb_colored_text
 
 if TYPE_CHECKING:
@@ -25,7 +26,7 @@ class Updater(ABC):
     Should be subclassed for a specific implementation (e.g. `somebar`, `dwlb`...)
     """
 
-    def __init__(self) -> None:  # noqa: D107
+    def __init__(self, *, picostatus: bool = False) -> None:  # noqa: D107
         self.separator = CONFIG.separator
         self.padding = CONFIG.edge_padding
         self.modules: list[Module] = []
@@ -33,6 +34,8 @@ class Updater(ABC):
         self.last_output: str = ""
         self.update_queue: asyncio.Queue[Module] = asyncio.Queue()
         self.tasks: set[asyncio.Task] = set()
+
+        self.picostatus = PicoStatusUpdater() if picostatus else None
 
     async def add_module(self, module: Module) -> None:
         """Add a module to this updater."""
@@ -81,7 +84,7 @@ class Updater(ABC):
             while True:
                 try:
                     await asyncio.wait_for(self.update_queue.get(), timeout=debounce_s)
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     break
             await self.write_output()
 
@@ -93,8 +96,8 @@ class SomebarUpdater(Updater):
     string beginning "status " to the pipe, followed by the bar text and a newline.
     """
 
-    def __init__(self) -> None:  # noqa: D107
-        super().__init__()
+    def __init__(self, *, picostatus: bool = False) -> None:  # noqa: D107
+        super().__init__(picostatus=picostatus)
         xdg_runtime_dir = os.environ["XDG_RUNTIME_DIR"]
         self.somebar = Path(xdg_runtime_dir) / "somebar-0"
 
@@ -128,8 +131,8 @@ class DwlbUpdater(Updater):
     uv run pysomebar | dwlb -status-stdin all
     """
 
-    def __init__(self) -> None:  # noqa: D107
-        super().__init__()
+    def __init__(self, *, picostatus: bool = False) -> None:  # noqa: D107
+        super().__init__(picostatus=picostatus)
         self.separator = make_dwlb_colored_text(self.separator, fg=CONFIG.separator_color)
 
     async def write_output(self) -> None:
