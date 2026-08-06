@@ -54,12 +54,22 @@ class MPDStatus:
             now_playing = await client.playlistinfo(song)  # ty:ignore[unresolved-attribute]
         else:
             return MPDStatus(
-                state=s["state"], song=song, artist="Stopped", title="Stopped", pos=pos, dur=dur
+                state=s["state"],
+                song=song,
+                artist="Stopped",
+                title="Stopped",
+                pos=pos,
+                dur=dur,
             )
 
         if len(now_playing) == 0:
             return MPDStatus(
-                state=s["state"], song=song, artist="Stopped", title="Stopped", pos=pos, dur=dur
+                state=s["state"],
+                song=song,
+                artist="Stopped",
+                title="Stopped",
+                pos=pos,
+                dur=dur,
             )
 
         now_playing = now_playing[0]
