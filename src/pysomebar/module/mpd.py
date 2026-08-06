@@ -136,8 +136,9 @@ class MPDModule(Module):
 
             try:
                 await self.make_output()
-                async for _ in self.client.idle():
-                    await self.make_output()
+                await asyncio.sleep(self.interval)
+                # async for _ in self.client.idle():
+                #     await self.make_output()
 
             except (ConnectionResetError, BrokenPipeError, OSError, mpd.base.MPDError):
                 with contextlib.suppress(Exception):
