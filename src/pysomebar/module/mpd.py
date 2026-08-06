@@ -25,6 +25,8 @@ class MPDStatus:
     song: int | None
     artist: str
     title: str
+    pos: int
+    dur: int
 
     _STATE_ICONS: ClassVar[dict[MPDPlayerState, str]] = {
         "play": "",
@@ -45,20 +47,34 @@ class MPDStatus:
         """Create an MPDStatus from MPDClient polls to status() and playlistinfo()."""
         s = await client.status()  # ty:ignore[unresolved-attribute]
         song = s.get("song")
+        pos = 0
+        dur = 100
+
         if song is not None:
             now_playing = await client.playlistinfo(song)  # ty:ignore[unresolved-attribute]
         else:
-            return MPDStatus(state=s["state"], song=song, artist="Stopped", title="Stopped")
+            return MPDStatus(
+                state=s["state"], song=song, artist="Stopped", title="Stopped", pos=pos, dur=dur
+            )
 
         if len(now_playing) == 0:
-            return MPDStatus(state=s["state"], song=song, artist="Stopped", title="Stopped")
+            return MPDStatus(
+                state=s["state"], song=song, artist="Stopped", title="Stopped", pos=pos, dur=dur
+            )
 
         now_playing = now_playing[0]
+        time = s.get("time")
+        if isinstance(time, str):
+            time = time.split(":")
+            pos = int(time[0])
+            dur = int(time[1])
         return MPDStatus(
             state=s["state"],
             song=song,
             artist=now_playing.get("artist", "Unknown"),
             title=now_playing.get("title", "Unknown"),
+            pos=pos,
+            dur=dur,
         )
 
 
@@ -73,6 +89,7 @@ class MPDModule(Module):
         self.do_initial_update = False
         self.client = MPDClient()
         self.connect_retries = 10
+        self.status: MPDStatus | None = None
 
     async def connect(self) -> None:
         """Connect to MPD if not already connected."""
@@ -86,12 +103,12 @@ class MPDModule(Module):
 
     async def make_output(self) -> None:
         """Make output from volume and mute status."""
-        status = await MPDStatus.from_client(self.client)
+        self.status = await MPDStatus.from_client(self.client)
 
-        if status.state == "stop":
-            self.output = f"{status.state_icon}"
+        if self.status.state == "stop":
+            self.output = f"{self.status.state_icon}"
         else:
-            self.output = f"{status.state_icon} {status.artist} - {status.title}"
+            self.output = f"{self.status.state_icon} {self.status.artist} - {self.status.title}"
 
         await self.request_redraw()
 
