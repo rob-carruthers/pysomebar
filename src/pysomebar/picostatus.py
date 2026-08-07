@@ -1,4 +1,3 @@
-import contextlib
 import asyncio
 import datetime
 import json
@@ -19,11 +18,13 @@ class PicoStatusUpdater:
         port: str = "/dev/ttyACM1",
         baud: int = 115200,
         interval_secs: float = 0.5,
+        debounce_secs: float = 0.05,
     ) -> None:
         self.modules = modules
         self.port = port
         self.baud = baud
-        self.interval = interval_secs
+        self.interval_secs = interval_secs
+        self.debounce_secs = debounce_secs
         self.reader: asyncio.StreamReader
         self.writer: asyncio.StreamWriter
         self.update_event = asyncio.Event()
@@ -72,8 +73,8 @@ class PicoStatusUpdater:
             while True:
                 now = asyncio.get_running_loop().time()
                 elapsed = now - last_write
-                if elapsed < self.interval:
-                    await asyncio.sleep(self.interval - elapsed)
+                if elapsed < self.debounce_secs:
+                    await asyncio.sleep(self.debounce_secs - elapsed)
 
                 line = json.dumps(self.format_status())
                 self.writer.write((line + "\n").encode())
@@ -81,7 +82,7 @@ class PicoStatusUpdater:
                 last_write = asyncio.get_running_loop().time()
 
                 try:
-                    await asyncio.wait_for(self.update_event.wait(), timeout=self.interval)
+                    await asyncio.wait_for(self.update_event.wait(), timeout=self.interval_secs)
                     self.update_event.clear()
                 except TimeoutError:
                     pass
