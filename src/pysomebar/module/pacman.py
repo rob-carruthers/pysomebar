@@ -17,6 +17,7 @@ class PacmanModule(NeedsInternetModule):
         super().__init__(name=self.name, interval=CONFIG.pacman.interval)
 
         self.refresh_signal = 1
+        self.raw_output = self.output
 
     async def update(self) -> None:  # noqa: D102
         for _ in range(self.connect_retries):
@@ -27,6 +28,7 @@ class PacmanModule(NeedsInternetModule):
             await asyncio.sleep(self.retry_interval)
 
             self.output = "No network!"
+            self.raw_output = "No network!"
 
     async def get_n_updates(self) -> int | None:
         """Return update count, or None if checkupdates couldn't run/sync."""
@@ -62,13 +64,15 @@ class PacmanModule(NeedsInternetModule):
         if n_updates is None:
             self.output = "No network!"
         elif n_updates > 0:
-            self.output = f"Updates: {n_updates}"
+            self.output = str(n_updates) + (" update" if n_updates == 1 else " updates")
             if CONFIG.bar_type == "dwlb":
+                self.raw_output = self.output
                 self.output = make_dwlb_colored_text(
                     self.output,
                     fg=CONFIG.pacman.available_updates_color,
                 )
         else:
             self.output = "No updates"
+            self.raw_output = self.output
 
         await self.request_redraw()

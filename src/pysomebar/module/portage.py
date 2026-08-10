@@ -48,7 +48,12 @@ class PortageModule(Module):
 
             n_updates = await self.get_n_updates()
 
-        self.output = f"Updates: {n_updates}" if n_updates > 0 else "No updates"
+        if n_updates == 0:
+            self.output = "No updates"
+        elif n_updates == 1:
+            self.output = "1 update"
+        else:
+            self.output = f"{n_updates} updates"
 
         if CONFIG.bar_type == "dwlb" and n_updates > 0:
             self.output = make_dwlb_colored_text(

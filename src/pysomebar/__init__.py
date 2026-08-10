@@ -69,17 +69,18 @@ async def main_loop() -> None:
     loop = asyncio.get_running_loop()
     stop_event = asyncio.Event()
     loop.add_signal_handler(signal.SIGPIPE, stop_event.set)
+    picostatus = True
 
     match CONFIG.bar_type:
         case "somebar":
-            updater = SomebarUpdater()
+            updater = SomebarUpdater(picostatus=picostatus)
         case "dwlb":
-            updater = DwlbUpdater()
+            updater = DwlbUpdater(picostatus=picostatus)
 
     await instantiate_modules(updater)
 
     signal_groups: dict[int, list[Module]] = {}
-    for module in updater.modules:
+    for module in updater.modules.values():
         if module.refresh_signal is not None:
             signal_groups.setdefault(module.refresh_signal, []).append(module)
 
@@ -93,9 +94,14 @@ async def main_loop() -> None:
 
     await updater.initial_update()
     updater_task = asyncio.create_task(updater.loop())
+    if updater.picostatus:
+        picostatus_task = asyncio.create_task(updater.picostatus.run())
 
     await stop_event.wait()
+
     updater_task.cancel()
+    if updater.picostatus:
+        picostatus_task.cancel()
 
     for task in updater.tasks:
         task.cancel()
