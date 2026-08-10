@@ -64,7 +64,7 @@ class PacmanModule(NeedsInternetModule):
         if n_updates is None:
             self.output = "No network!"
         elif n_updates > 0:
-            self.output = f"Updates: {n_updates}"
+            self.output = str(n_updates) + (" update" if n_updates == 1 else " updates")
             if CONFIG.bar_type == "dwlb":
                 self.raw_output = self.output
                 self.output = make_dwlb_colored_text(
