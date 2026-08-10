@@ -7,12 +7,12 @@ from typing import TYPE_CHECKING, Literal
 
 import serial_asyncio
 
-from pysomebar.module import Module, MPDModule, PacmanModule
+from pysomebar.module import Module, MPDModule, PacmanModule, PulseModule
 
 if TYPE_CHECKING:
     from pysomebar.module.mpd import MPDPlayerState
 
-PicoStatusInputDataType = Literal["time", "mpd", "pacman"]
+PicoStatusInputDataType = Literal["time", "mpd", "pacman", "pulse"]
 
 
 class PicoStatusUpdater:
@@ -71,6 +71,16 @@ class PicoStatusUpdater:
 
         return pacman_module.raw_output
 
+    def get_pulse_data(self) -> tuple[str, bool]:
+        """Retrieve latest PulseAudio data from running PulseModule."""
+        pulse_module = self.modules.get("pulse")
+        if not isinstance(pulse_module, PulseModule):
+            return "No volume!", False
+
+        muted = "M " if pulse_module.current_muted else " "
+        vol = str(pulse_module.current_volume).rjust(3)
+        return f"{muted}{vol}%", pulse_module.is_headset
+
     def get_current_time(self, fmt: str = "%H:%M:%S") -> str:
         """Get the current time as string."""
         now = datetime.datetime.now(tz=datetime.UTC).astimezone()
@@ -80,12 +90,14 @@ class PicoStatusUpdater:
         """Create the status data as dict from modules."""
         mpd_now_playing, state, pos, dur = self.get_mpd_data()
         pacman_updates = self.get_pacman_data()
+        current_volume, is_headset = self.get_pulse_data()
         now = self.get_current_time()
 
         return {
             "time": {"text": now},
             "mpd": {"text": mpd_now_playing, "state": state, "dur": dur, "pos": pos},
             "pacman": {"text": pacman_updates},
+            "pulse": {"text": current_volume, "is_headset": is_headset},
         }
 
     async def main_loop(self) -> None:
