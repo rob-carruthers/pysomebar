@@ -18,6 +18,7 @@ class PulseModule(Module):
     name = "pulse"
 
     vol_muted_icon = ""
+    # thresholds below must be in descending order.
     vol_icons = MappingProxyType({70: "", 40: "", -1: ""})
     headset_icon = ""
 
