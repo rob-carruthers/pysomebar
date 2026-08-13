@@ -29,7 +29,7 @@ class PicoStatusUpdater:
         modules: dict[str, Module],
         port: str = "/dev/ttyACM1",
         baud: int = 115200,
-        interval_secs: float = 0.5,
+        interval_secs: float = 0.25,
         debounce_secs: float = 0.05,
     ) -> None:
         """Initialise USB CDC writer."""
@@ -77,7 +77,7 @@ class PicoStatusUpdater:
         if not isinstance(pulse_module, PulseModule):
             return "No volume!", False
 
-        muted = "M " if pulse_module.current_muted else " "
+        muted = "M " if pulse_module.current_muted else "  "
         vol = str(pulse_module.current_volume).rjust(3)
         return f"{muted}{vol}%", pulse_module.is_headset
 
