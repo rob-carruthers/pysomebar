@@ -1,13 +1,16 @@
 """Temp module for pysomebar."""
 
 from types import MappingProxyType
+from typing import TYPE_CHECKING
 
 import psutil
 
 from pysomebar.config import CONFIG
-from pysomebar.util import make_dwlb_colored_text
 
 from .module import Module
+
+if TYPE_CHECKING:
+    from pysomebar.util import ColoriserProtocol
 
 
 def convert_time(seconds: int) -> str:
@@ -32,8 +35,8 @@ class TempModule(Module):
         },
     )
 
-    def __init__(self) -> None:  # noqa: D107
-        super().__init__(name=self.name, interval=CONFIG.temp.interval)
+    def __init__(self, coloriser: ColoriserProtocol | None) -> None:  # noqa: D107
+        super().__init__(coloriser=coloriser, name=self.name, interval=CONFIG.temp.interval)
 
     async def update(self) -> None:
         """Update output with current date/time in chosen format."""
@@ -42,8 +45,8 @@ class TempModule(Module):
         icon = next(icon for thresh, icon in self.icons.items() if temp >= thresh)
         self.output = f"{icon} {temp}°C"
 
-        if CONFIG.bar_type == "dwlb":
+        if self.coloriser is not None:
             color = next(color for thresh, color in self.colors.items() if temp >= thresh)
-            self.output = make_dwlb_colored_text(self.output, fg=color)
+            self.output = self.coloriser(self.output, fg=color)
 
         await self.request_redraw()

@@ -1,10 +1,14 @@
 """Date module for pysomebar."""
 
 import datetime
+from typing import TYPE_CHECKING
 
 from pysomebar.config import CONFIG
 
 from .module import Module
+
+if TYPE_CHECKING:
+    from pysomebar.util import ColoriserProtocol
 
 
 class DateModule(Module):
@@ -12,8 +16,8 @@ class DateModule(Module):
 
     name = "date"
 
-    def __init__(self) -> None:  # noqa: D107
-        super().__init__(name=self.name, interval=CONFIG.date.interval)
+    def __init__(self, coloriser: ColoriserProtocol | None) -> None:  # noqa: D107
+        super().__init__(coloriser=coloriser, name=self.name, interval=CONFIG.date.interval)
 
         # Set static base_interval - self.interval may change to sync to 0 seconds
         self.base_interval = CONFIG.date.interval

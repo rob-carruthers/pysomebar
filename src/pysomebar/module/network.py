@@ -3,7 +3,7 @@
 import psutil
 
 from pysomebar.config import CONFIG
-from pysomebar.util import format_bytes, make_dwlb_colored_text
+from pysomebar.util import ColoriserProtocol, format_bytes
 
 from .module import Module
 
@@ -15,8 +15,8 @@ class NetworkModule(Module):
     recv_icon = "󰛴"
     sent_icon = "󰛶"
 
-    def __init__(self) -> None:  # noqa: D107
-        super().__init__(name=self.name, interval=CONFIG.network.interval)
+    def __init__(self, coloriser: ColoriserProtocol | None) -> None:  # noqa: D107
+        super().__init__(coloriser=coloriser, name=self.name, interval=CONFIG.network.interval)
 
         self.device = CONFIG.network.device
         self.padding = CONFIG.network.padding
@@ -69,7 +69,7 @@ class NetworkModule(Module):
         self.output = f"{self.recv_icon} {rate_recv} {self.sent_icon} {rate_sent}"
         self.recv, self.sent = new_recv, new_sent
 
-        if CONFIG.bar_type == "dwlb":
-            self.output = make_dwlb_colored_text(self.output, fg=CONFIG.base_color)
+        if self.coloriser is not None:
+            self.output = self.coloriser(self.output, fg=CONFIG.base_color)
 
         await self.request_redraw()

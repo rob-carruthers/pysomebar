@@ -2,14 +2,17 @@
 
 import asyncio
 from types import MappingProxyType
+from typing import TYPE_CHECKING
 
 import pulsectl_asyncio
 from pulsectl.pulsectl import PulseDisconnected, PulseError, PulseSinkInfo
 
 from pysomebar.config import CONFIG
-from pysomebar.util import make_dwlb_colored_text
 
 from .module import Module
+
+if TYPE_CHECKING:
+    from pysomebar.util import ColoriserProtocol
 
 
 class PulseModule(Module):
@@ -22,8 +25,8 @@ class PulseModule(Module):
     vol_icons = MappingProxyType({70: "", 40: "", -1: ""})
     headset_icon = ""
 
-    def __init__(self) -> None:  # noqa: D107
-        super().__init__(name=self.name, interval=CONFIG.pulse.interval)
+    def __init__(self, coloriser: ColoriserProtocol | None) -> None:  # noqa: D107
+        super().__init__(coloriser=coloriser, name=self.name, interval=CONFIG.pulse.interval)
 
         self.do_initial_update = False
         self.pulse = pulsectl_asyncio.PulseAsync("pysomebar-pulse")
@@ -83,8 +86,8 @@ class PulseModule(Module):
             )
             self.output += f"{icon} {self.current_volume}%"
 
-        if CONFIG.bar_type == "dwlb" and self.current_muted:
-            self.output = make_dwlb_colored_text(self.output, fg=CONFIG.pulse.mute_color)
+        if self.coloriser is not None and self.current_muted:
+            self.output = self.coloriser(self.output, fg=CONFIG.pulse.mute_color)
 
         await self.request_redraw()
 

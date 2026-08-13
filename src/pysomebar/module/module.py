@@ -2,7 +2,6 @@
 
 import asyncio
 import contextlib
-import socket
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -13,6 +12,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from pysomebar.updater import Updater
+    from pysomebar.util import ColoriserProtocol
 
 
 class Module(ABC):
@@ -20,7 +20,12 @@ class Module(ABC):
 
     name: str
 
-    def __init__(self, name: str = "", interval: int = 10) -> None:  # noqa: D107
+    def __init__(  # noqa: D107
+        self,
+        coloriser: ColoriserProtocol | None,
+        name: str = "",
+        interval: int = 10,
+    ) -> None:
         self.name = name
         self.updater: Updater | None = None
         self.interval = interval
@@ -28,6 +33,7 @@ class Module(ABC):
         self.output: str = ""
         self.refresh_signal: int | None = None
         self.refresh_event = asyncio.Event()
+        self.coloriser = coloriser
 
     def request_refresh(self) -> None:
         """Signal this module to refresh immediately, bypassing its interval wait."""
@@ -98,13 +104,14 @@ class NeedsInternetModule(Module, ABC):
 
     def __init__(  # noqa: D107
         self,
+        coloriser: ColoriserProtocol | None,
         name: str = "",
         interval: int = 10,
         retry_interval: float = 1.0,
         connect_retries: int = 20,
     ) -> None:
         self.name = name
-        super().__init__(name=name, interval=interval)
+        super().__init__(coloriser=coloriser, name=name, interval=interval)
         self.retry_interval = retry_interval
         self.connect_retries = connect_retries
         self.output = "..."

@@ -1,8 +1,15 @@
 """Utility methods."""
 
 import re
+from typing import Protocol
 
 from pysomebar.config import CONFIG
+
+
+class ColoriserProtocol(Protocol):
+    """Protocol for a callable which adds color tags to text."""
+
+    def __call__(self, text: str, *, fg: str = "", bg: str = "") -> str: ...  # noqa: D102
 
 
 def format_bytes(b: float, base: int = 1024) -> str:

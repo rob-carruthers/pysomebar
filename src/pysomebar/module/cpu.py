@@ -1,13 +1,16 @@
 """CPU usage module for pysomebar."""
 
 from types import MappingProxyType
+from typing import TYPE_CHECKING
 
 import psutil
 
 from pysomebar.config import CONFIG
-from pysomebar.util import make_dwlb_colored_text
 
 from .module import Module
+
+if TYPE_CHECKING:
+    from pysomebar.util import ColoriserProtocol
 
 
 class CPUModule(Module):
@@ -23,8 +26,8 @@ class CPUModule(Module):
         },
     )
 
-    def __init__(self) -> None:  # noqa: D107
-        super().__init__(name=self.name, interval=CONFIG.cpu.interval)
+    def __init__(self, coloriser: ColoriserProtocol | None) -> None:  # noqa: D107
+        super().__init__(coloriser=coloriser, name=self.name, interval=CONFIG.cpu.interval)
 
     async def update(self) -> None:
         """Update output with current CPU usage."""
@@ -33,8 +36,8 @@ class CPUModule(Module):
 
         self.output = " " + f"{cpu}%".rjust(5)
 
-        if CONFIG.bar_type == "dwlb":
+        if self.coloriser is not None:
             color = next(color for thresh, color in self.colors.items() if cpu >= thresh)
-            self.output = make_dwlb_colored_text(self.output, fg=color)
+            self.output = self.coloriser(self.output, fg=color)
 
         await self.request_redraw()

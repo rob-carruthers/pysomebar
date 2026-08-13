@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 import psutil
 
 from pysomebar.config import CONFIG
-from pysomebar.util import format_bytes, make_dwlb_colored_text
+from pysomebar.util import ColoriserProtocol, format_bytes
 
 from .module import Module
 
@@ -26,8 +26,8 @@ class MemoryModule(Module):
         },
     )
 
-    def __init__(self) -> None:  # noqa: D107
-        super().__init__(name=self.name, interval=CONFIG.memory.interval)
+    def __init__(self, coloriser: ColoriserProtocol | None) -> None:  # noqa: D107
+        super().__init__(coloriser=coloriser, name=self.name, interval=CONFIG.memory.interval)
 
     async def update(self) -> None:
         """Update output with current battery status."""
@@ -42,8 +42,8 @@ class MemoryModule(Module):
 
         self.output = f" {used_gb} / {available_gb}"
 
-        if CONFIG.bar_type == "dwlb":
+        if self.coloriser is not None:
             color = next(color for thresh, color in self.colors.items() if used_percent >= thresh)
-            self.output = make_dwlb_colored_text(self.output, fg=color)
+            self.output = self.coloriser(self.output, fg=color)
 
         await self.request_redraw()

@@ -1,13 +1,16 @@
 """Battery module for pysomebar."""
 
 from types import MappingProxyType
+from typing import TYPE_CHECKING
 
 import psutil
 
 from pysomebar.config import CONFIG
-from pysomebar.util import make_dwlb_colored_text
 
 from .module import Module
+
+if TYPE_CHECKING:
+    from pysomebar.util import ColoriserProtocol
 
 
 def convert_time(seconds: int) -> str:
@@ -60,8 +63,8 @@ class BatteryModule(Module):
         },
     )
 
-    def __init__(self) -> None:  # noqa: D107
-        super().__init__(name=self.name, interval=CONFIG.battery.interval)
+    def __init__(self, coloriser: ColoriserProtocol | None) -> None:  # noqa: D107
+        super().__init__(coloriser=coloriser, name=self.name, interval=CONFIG.battery.interval)
 
     def get_icon(self, percent: float, *, is_charging: bool = False) -> str:
         """Retrieve an appropriate icon from self.(dis)charging_icons."""
@@ -90,9 +93,9 @@ class BatteryModule(Module):
         is_charging = battery.power_plugged is True
         self.output = self.make_output(battery.percent, battery.secsleft, is_charging=is_charging)
 
-        if CONFIG.bar_type == "dwlb":
+        if self.coloriser is not None:
             rounded = int((battery.percent // 10) * 10)
             color = next(color for thresh, color in self.colors.items() if rounded >= thresh)
-            self.output = make_dwlb_colored_text(self.output, fg=color)
+            self.output = self.coloriser(self.output, fg=color)
 
         await self.request_redraw()

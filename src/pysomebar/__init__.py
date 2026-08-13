@@ -9,9 +9,10 @@ import sys
 from pathlib import Path
 
 from pysomebar.config import CONFIG
+from pysomebar.util import make_dwlb_colored_text
 
 from .module import Module
-from .updater import DwlbUpdater, SomebarUpdater, Updater
+from .updater import PipeOutputUpdater, SomebarUpdater, Updater
 
 PID_FILE = "pysomebar.pid"
 
@@ -60,7 +61,7 @@ async def instantiate_modules(updater: Updater) -> None:
             msg = f"Module `{module_name}` unrecognised."
             raise ValueError(msg)
         module_cls = available_modules[module_name]
-        await updater.add_module(module_cls())
+        await updater.add_module(module_cls(updater.coloriser))
 
 
 async def main_loop() -> None:
@@ -75,7 +76,7 @@ async def main_loop() -> None:
         case "somebar":
             updater = SomebarUpdater(picostatus=picostatus)
         case "dwlb":
-            updater = DwlbUpdater(picostatus=picostatus)
+            updater = PipeOutputUpdater(picostatus=picostatus, coloriser=make_dwlb_colored_text)
 
     await instantiate_modules(updater)
 

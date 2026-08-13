@@ -1,11 +1,14 @@
 """Pacman updates module for pysomebar."""
 
 import asyncio
+from typing import TYPE_CHECKING
 
 from pysomebar.config import CONFIG
-from pysomebar.util import make_dwlb_colored_text
 
 from .module import NeedsInternetModule
+
+if TYPE_CHECKING:
+    from pysomebar.util import ColoriserProtocol
 
 
 class PacmanModule(NeedsInternetModule):
@@ -13,8 +16,8 @@ class PacmanModule(NeedsInternetModule):
 
     name = "pacman"
 
-    def __init__(self) -> None:  # noqa: D107
-        super().__init__(name=self.name, interval=CONFIG.pacman.interval)
+    def __init__(self, coloriser: ColoriserProtocol | None) -> None:  # noqa: D107
+        super().__init__(coloriser=coloriser, name=self.name, interval=CONFIG.pacman.interval)
 
         self.refresh_signal = 1
         self.raw_output = self.output
@@ -65,9 +68,9 @@ class PacmanModule(NeedsInternetModule):
             self.output = "No network!"
         elif n_updates > 0:
             self.output = str(n_updates) + (" update" if n_updates == 1 else " updates")
-            if CONFIG.bar_type == "dwlb":
+            if self.coloriser is not None:
                 self.raw_output = self.output
-                self.output = make_dwlb_colored_text(
+                self.output = self.coloriser(
                     self.output,
                     fg=CONFIG.pacman.available_updates_color,
                 )

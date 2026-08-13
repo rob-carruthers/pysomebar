@@ -1,6 +1,7 @@
 """Brightness module for pysomebar."""
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import aiofiles
 from asyncinotify import Mask
@@ -9,14 +10,17 @@ from pysomebar.config import CONFIG
 
 from .module import Module
 
+if TYPE_CHECKING:
+    from pysomebar.util import ColoriserProtocol
+
 
 class BrightnessModule(Module):
     """Module for monitoring brightness via /sys/class/backlight/."""
 
     name = "brightness"
 
-    def __init__(self) -> None:  # noqa: D107
-        super().__init__(name=self.name, interval=CONFIG.brightness.interval)
+    def __init__(self, coloriser: ColoriserProtocol | None) -> None:  # noqa: D107
+        super().__init__(coloriser=coloriser, name=self.name, interval=CONFIG.brightness.interval)
 
         self.do_initial_update = False
 

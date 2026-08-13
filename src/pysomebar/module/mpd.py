@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 from dataclasses import dataclass
-from typing import ClassVar, Literal
+from typing import TYPE_CHECKING, ClassVar, Literal
 
 import mpd
 from mpd.asyncio import MPDClient
@@ -13,6 +13,9 @@ from mpd.asyncio import MPDClient
 from pysomebar.config import CONFIG
 
 from .module import Module
+
+if TYPE_CHECKING:
+    from pysomebar.util import ColoriserProtocol
 
 MPDPlayerState = Literal["play", "stop", "pause"]
 
@@ -93,8 +96,8 @@ class MPDModule(Module):
 
     name = "mpd"
 
-    def __init__(self) -> None:  # noqa: D107
-        super().__init__(name=self.name, interval=CONFIG.mpd.interval)
+    def __init__(self, coloriser: ColoriserProtocol | None) -> None:  # noqa: D107
+        super().__init__(coloriser=coloriser, name=self.name, interval=CONFIG.mpd.interval)
 
         self.do_initial_update = False
         self.client = MPDClient()

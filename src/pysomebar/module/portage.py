@@ -2,13 +2,16 @@
 
 import asyncio
 import re
+from typing import TYPE_CHECKING
 
 from asyncinotify import Mask
 
 from pysomebar.config import CONFIG
-from pysomebar.util import make_dwlb_colored_text
 
 from .module import Module
+
+if TYPE_CHECKING:
+    from pysomebar.util import ColoriserProtocol
 
 
 class PortageModule(Module):
@@ -16,8 +19,12 @@ class PortageModule(Module):
 
     name = "portage"
 
-    def __init__(self, spinner: str = "Syncing portage...") -> None:  # noqa: D107
-        super().__init__(name=self.name, interval=CONFIG.portage.interval)
+    def __init__(  # noqa: D107
+        self,
+        coloriser: ColoriserProtocol | None,
+        spinner: str = "Syncing portage...",
+    ) -> None:
+        super().__init__(coloriser=coloriser, name=self.name, interval=CONFIG.portage.interval)
 
         self.do_initial_update = False
         self.spinner = spinner
@@ -55,11 +62,8 @@ class PortageModule(Module):
         else:
             self.output = f"{n_updates} updates"
 
-        if CONFIG.bar_type == "dwlb" and n_updates > 0:
-            self.output = make_dwlb_colored_text(
-                self.output,
-                fg=CONFIG.portage.available_updates_color,
-            )
+        if self.coloriser is not None and n_updates > 0:
+            self.output = self.coloriser(self.output, fg=CONFIG.portage.available_updates_color)
 
         await self.request_redraw()
 

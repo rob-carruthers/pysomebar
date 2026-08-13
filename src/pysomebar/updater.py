@@ -12,9 +12,10 @@ import aiofiles
 
 from pysomebar.config import CONFIG
 from pysomebar.picostatus import PicoStatusUpdater
-from pysomebar.util import make_dwlb_colored_text
 
 if TYPE_CHECKING:
+    from pysomebar.util import ColoriserProtocol
+
     from .module import Module
 
 
@@ -26,7 +27,12 @@ class Updater(ABC):
     Should be subclassed for a specific implementation (e.g. `somebar`, `dwlb`...)
     """
 
-    def __init__(self, *, picostatus: bool = False) -> None:  # noqa: D107
+    def __init__(  # noqa: D107
+        self,
+        *,
+        picostatus: bool = False,
+        coloriser: ColoriserProtocol | None = None,
+    ) -> None:
         self.separator = CONFIG.separator
         self.padding = CONFIG.edge_padding
         self.modules: dict[str, Module] = {}
@@ -34,6 +40,7 @@ class Updater(ABC):
         self.last_output: str = ""
         self.update_queue: asyncio.Queue[Module] = asyncio.Queue()
         self.tasks: set[asyncio.Task] = set()
+        self.coloriser = coloriser
 
         self.picostatus = PicoStatusUpdater(modules=self.modules) if picostatus else None
 
@@ -124,18 +131,24 @@ class SomebarUpdater(Updater):
                 self.last_output = joined_output
 
 
-class DwlbUpdater(Updater):
-    """Updater for `dwlb`.
+class PipeOutputUpdater(Updater):
+    """Updater for any bar which takes input via stdin.
 
-    Usually dwlb will be initialised via `dwl -s dwlb`. `pysomebar` should then be piped into
-    another instance of dwlb, which will update status on stdout write. i.e.:
+    E.g. dwlb: usually dwlb will be initialised via `dwl -s dwlb`. `pysomebar` should then be piped
+    into another instance of dwlb, which will update status on stdout write. i.e.:
 
     uv run pysomebar | dwlb -status-stdin all
     """
 
-    def __init__(self, *, picostatus: bool = False) -> None:  # noqa: D107
-        super().__init__(picostatus=picostatus)
-        self.separator = make_dwlb_colored_text(self.separator, fg=CONFIG.separator_color)
+    def __init__(  # noqa: D107
+        self,
+        *,
+        picostatus: bool = False,
+        coloriser: ColoriserProtocol | None = None,
+    ) -> None:
+        super().__init__(picostatus=picostatus, coloriser=coloriser)
+        if self.coloriser is not None:
+            self.separator = self.coloriser(self.separator, fg=CONFIG.separator_color)
 
     async def write_output(self) -> None:
         """Write output to stdout."""
