@@ -101,23 +101,30 @@ class PicoStatusUpdater:
         }
 
     async def main_loop(self) -> None:
-        """Continuously wait for an update event, then write to serial writer."""
-        while True:
-            now = asyncio.get_running_loop().time()
-            elapsed = now - self.last_write
-            if elapsed < self.debounce_secs:
-                await asyncio.sleep(self.debounce_secs - elapsed)
+        """Continuously wait for an update event or the next tick boundary, then write.
 
+        Attempt to synchronise ticks to wall clock using interval_secs.
+        """
+        while True:
             line = json.dumps(self.format_status())
             self.writer.write((line + "\n").encode())
             await self.writer.drain()
             self.last_write = asyncio.get_running_loop().time()
 
+            now = datetime.datetime.now(tz=datetime.UTC).timestamp()
+            next_tick = (now // self.interval_secs + 1) * self.interval_secs
+            timeout = next_tick - now
+
             try:
-                await asyncio.wait_for(self.update_event.wait(), timeout=self.interval_secs)
+                await asyncio.wait_for(self.update_event.wait(), timeout=timeout)
                 self.update_event.clear()
             except TimeoutError:
-                pass
+                continue
+
+            # If the event fired early on update_event, debounce before continuing
+            elapsed = asyncio.get_running_loop().time() - self.last_write
+            if elapsed < self.debounce_secs:
+                await asyncio.sleep(self.debounce_secs - elapsed)
 
     async def run(self) -> None:
         """Run the main loop."""
