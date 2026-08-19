@@ -70,7 +70,7 @@ async def main_loop() -> None:
     loop = asyncio.get_running_loop()
     stop_event = asyncio.Event()
     loop.add_signal_handler(signal.SIGPIPE, stop_event.set)
-    picostatus = True
+    picostatus = CONFIG.picostatus
 
     match CONFIG.bar_type:
         case "somebar":

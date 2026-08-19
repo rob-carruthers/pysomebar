@@ -160,6 +160,7 @@ class Config(BaseModel):
     edge_padding: int = 0
     colors: dict[str, str] = {"white": "#ffffff"}
     try_reconnect_interval: float = 0.5
+    picostatus: bool = False
     battery: BatteryModuleConfig = BatteryModuleConfig()
     memory: MemoryModuleConfig = MemoryModuleConfig()
     cpu: CPUModuleConfig = CPUModuleConfig()
