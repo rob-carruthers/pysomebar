@@ -2,6 +2,7 @@
 
 import re
 from typing import Protocol
+from xml.sax.saxutils import escape as xml_escape
 
 from pysomebar.config import CONFIG
 
@@ -29,11 +30,12 @@ def format_bytes(b: float, base: int = 1024) -> str:
     return f"{round(b / base**3, round_n)}G"
 
 
-def make_dwlb_colored_text(text: str, *, fg: str = "", bg: str = "") -> str:
-    """Attach beginning and terminating color tags to `text` for dwlb output."""
-    # Look up colors from config if not already hex colors.
-    # If field is already empty string, leave it empty
-    # If a lookup was needed but didn't exist, default to #ffffff.
+def sanitize_colors(fg: str, bg: str) -> tuple[str, str]:
+    """Look up colors from config if not already hex colors.
+
+    If field is already empty string, leave it empty.
+    If a lookup was needed but didn't exist, default to #ffffff.
+    """
     if fg and not fg.startswith("#"):
         fg = CONFIG.colors.get(fg, "#ffffff")
     if bg and not bg.startswith("#"):
@@ -44,10 +46,16 @@ def make_dwlb_colored_text(text: str, *, fg: str = "", bg: str = "") -> str:
             msg = "`color` is not a valid hex color."
             raise ValueError(msg)
 
+    return fg, bg
+
+
+def make_dwlb_colored_text(text: str, *, fg: str = "", bg: str = "") -> str:
+    """Attach beginning and terminating color tags to `text` for dwlb output."""
+    fg, bg = sanitize_colors(fg, bg)
+    output = ""
+
     fg = fg.replace("#", "")
     bg = bg.replace("#", "")
-
-    output = ""
 
     if fg:
         output += f"^fg({fg})"
@@ -62,3 +70,20 @@ def make_dwlb_colored_text(text: str, *, fg: str = "", bg: str = "") -> str:
         output += "^bg()"
 
     return output
+
+
+def make_pango_colored_text(text: str, *, fg: str = "", bg: str = "") -> str:
+    """Wrap `text` in a Pango <span> tag for waybar output."""
+    fg, bg = sanitize_colors(fg, bg)
+
+    attrs = ""
+    if fg:
+        attrs += f' foreground="{fg}"'
+    if bg:
+        attrs += f' background="{bg}"'
+
+    text = xml_escape(text)
+
+    if not attrs:
+        return text
+    return f"<span{attrs}>{text}</span>"
