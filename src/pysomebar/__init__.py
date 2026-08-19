@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 from pysomebar.config import CONFIG
-from pysomebar.util import make_dwlb_colored_text
+from pysomebar.util import make_dwlb_colored_text, make_pango_colored_text
 
 from .module import Module
 from .updater import PipeOutputUpdater, SomebarUpdater, Updater
@@ -77,6 +77,11 @@ async def main_loop() -> None:
             updater = SomebarUpdater(picostatus=picostatus)
         case "dwlb":
             updater = PipeOutputUpdater(picostatus=picostatus, coloriser=make_dwlb_colored_text)
+        case "waybar":
+            updater = PipeOutputUpdater(picostatus=picostatus, coloriser=make_pango_colored_text)
+        case _:
+            msg = f"bar_type `{CONFIG.bar_type}` unsupported."
+            raise ValueError(msg)
 
     await instantiate_modules(updater)
 

@@ -11,7 +11,7 @@ xdg_config = xdg_config_home() / "pysomebar" / "config.toml"
 
 CONFIG_FILE = xdg_config.resolve() if xdg_config.exists() else Path("./config.toml")
 
-BarType = Literal["somebar", "dwlb"]
+BarType = Literal["somebar", "dwlb", "waybar"]
 
 
 class ModuleConfig(BaseModel):
