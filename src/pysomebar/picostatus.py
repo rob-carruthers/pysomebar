@@ -60,7 +60,10 @@ class PicoStatusUpdater:
         if status.state == "stop":
             return "Stopped", "stop", status.pos, status.dur
 
-        now_playing = status.artist + " - " + status.title
+        if status.artist == "Unknown":
+            now_playing = status.title
+        else:
+            now_playing = status.artist + " - " + status.title
         return now_playing, status.state, status.pos, status.dur
 
     def get_pacman_data(self) -> str:
