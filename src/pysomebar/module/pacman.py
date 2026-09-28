@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class PacmanModule(NeedsInternetModule):
-    """Module for printing date/time."""
+    """Module for checking Arch package update status."""
 
     name = "pacman"
 
