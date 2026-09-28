@@ -10,6 +10,8 @@ from .module import NeedsInternetModule
 if TYPE_CHECKING:
     from pysomebar.util import ColoriserProtocol
 
+RESTART_PACKAGES = ("linux", "systemd")
+
 
 class PacmanModule(NeedsInternetModule):
     """Module for checking Arch package update status."""
@@ -33,8 +35,17 @@ class PacmanModule(NeedsInternetModule):
             self.output = "No network!"
             self.raw_output = "No network!"
 
-    async def get_n_updates(self) -> int | None:
-        """Return update count, or None if checkupdates couldn't run/sync."""
+    async def get_updates(self) -> tuple[int, bool] | None:
+        """Return update count and restart status, or None if checkupdates couldn't run/sync.
+
+        Returns
+        -------
+        int
+            Update count
+        bool
+            Whether a restart is required
+
+        """
         no_updates = 2
         try:
             proc = await asyncio.create_subprocess_exec(
@@ -51,25 +62,28 @@ class PacmanModule(NeedsInternetModule):
             return None
 
         if proc.returncode == no_updates:
-            return 0
+            return 0, False
         if proc.returncode != 0:
             return None
 
-        return len([line for line in stdout.decode().split("\n") if line])
+        updates = [line for line in stdout.decode().split("\n") if line]
+        restart_required = any(line.split(" ", 1)[0] in RESTART_PACKAGES for line in updates)
+        return len(updates), restart_required
 
     async def make_output(self) -> None:
         """Set 'spinner', get `n_updates` and update status."""
         self.output = "Updating..."
         await self.request_redraw()
 
-        n_updates = await self.get_n_updates()
+        result = await self.get_updates()
 
-        if n_updates is None:
+        if result is None:
             self.output = "No network!"
-        elif n_updates > 0:
-            self.output = str(n_updates) + (" update" if n_updates == 1 else " updates")
+        elif result[0] > 0:
+            self.output = str(result[0]) + (" update" if result[0] == 1 else " updates")
+            self.output += " (restart)" if result[1] else ""
+            self.raw_output = self.output
             if self.coloriser is not None:
-                self.raw_output = self.output
                 self.output = self.coloriser(
                     self.output,
                     fg=CONFIG.pacman.available_updates_color,
