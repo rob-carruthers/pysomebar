@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Literal
 
 import serial_asyncio
 
-from pysomebar.module import Module, MPDModule, PacmanModule, PulseModule
+from pysomebar.module import Module, MPDModule, PacmanModule, PulseModule, PortageModule
 
 if TYPE_CHECKING:
     from pysomebar.module.mpd import MPDPlayerState
@@ -66,13 +66,21 @@ class PicoStatusUpdater:
             now_playing = status.artist + " - " + status.title
         return now_playing, status.state, status.pos, status.dur
 
-    def get_pacman_data(self) -> str:
+    def get_pacman_data(self) -> str | None:
         """Retrieve latest pacman data from running PacmanModule."""
         pacman_module = self.modules.get("pacman")
         if not isinstance(pacman_module, PacmanModule):
-            return "No network!"
+            return None
 
         return pacman_module.raw_output
+
+    def get_portage_data(self) -> str | None:
+        """Retrieve latest portage data from running portageModule."""
+        portage_module = self.modules.get("portage")
+        if not isinstance(portage_module, PortageModule):
+            return None
+
+        return portage_module.raw_output
 
     def get_pulse_data(self) -> tuple[str, bool]:
         """Retrieve latest PulseAudio data from running PulseModule."""
@@ -93,13 +101,21 @@ class PicoStatusUpdater:
         """Create the status data as dict from modules."""
         mpd_now_playing, state, pos, dur = self.get_mpd_data()
         pacman_updates = self.get_pacman_data()
+        portage_updates = self.get_portage_data()
         current_volume, is_headset = self.get_pulse_data()
         now = self.get_current_time()
+
+        if pacman_updates:
+            updates = pacman_updates
+        elif portage_updates:
+            updates = portage_updates
+        else:
+            updates = "No updates"
 
         return {
             "time": {"text": now},
             "mpd": {"text": mpd_now_playing, "state": state, "dur": dur, "pos": pos},
-            "pacman": {"text": pacman_updates},
+            "pacman": {"text": updates},
             "pulse": {"text": current_volume, "is_headset": is_headset},
         }
 

@@ -29,6 +29,7 @@ class PortageModule(Module):
         self.do_initial_update = False
         self.spinner = spinner
         self._lock = asyncio.Lock()
+        self.raw_output = self.output
 
     async def update(self) -> None:
         """Passthrough as we handle everything in loop()."""
@@ -62,6 +63,7 @@ class PortageModule(Module):
         else:
             self.output = f"{n_updates} updates"
 
+        self.raw_output = self.output
         if self.coloriser is not None and n_updates > 0:
             self.output = self.coloriser(self.output, fg=CONFIG.portage.available_updates_color)
 
