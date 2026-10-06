@@ -72,6 +72,28 @@ def make_dwlb_colored_text(text: str, *, fg: str = "", bg: str = "") -> str:
     return output
 
 
+def make_polybar_colored_text(text: str, *, fg: str = "", bg: str = "") -> str:
+    """Attach beginning and terminating color tags to `text` for dwlb output."""
+    fg, bg = sanitize_colors(fg, bg)
+    output = ""
+
+    # text = text.replace(r"%", r"%%")
+
+    if fg:
+        output += f"%{{F{fg}}}"
+    if bg:
+        output += f"%{{B{bg}}}"
+
+    output += text
+
+    if fg:
+        output += "%{F-}"
+    if bg:
+        output += "%{B-}"
+
+    return output
+
+
 def make_pango_colored_text(text: str, *, fg: str = "", bg: str = "") -> str:
     """Wrap `text` in a Pango <span> tag for waybar output."""
     fg, bg = sanitize_colors(fg, bg)
