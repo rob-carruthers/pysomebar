@@ -154,6 +154,8 @@ class YNABModuleConfig(ModuleConfig):
 
     access_token: str | None = None
     plan_id: str | None = None
+    negative_percent_color: str = "green_d"
+    positive_percent_color: str = "red_d"
 
 
 class Config(BaseModel):

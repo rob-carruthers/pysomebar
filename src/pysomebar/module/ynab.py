@@ -88,19 +88,20 @@ def get_period_total(
     return round(float(amount) or 0.0, 2)
 
 
-def format_output(df: pl.DataFrame) -> str:
+def format_output(df: pl.DataFrame) -> tuple[str, int | None]:
     """Format amounts and percent change since last week."""
     past_week = get_period_total(df)
     week_before = get_period_total(df, weeks_ago=1)
 
     if week_before == 0:
         change = "N/A"
+        percent_change = None
     else:
         percent_change = round((abs(past_week) / abs(week_before) - 1) * 100)
         sign = "+" if percent_change > 0 else ""
         change = f"{sign}{percent_change}%"
 
-    return f"Week: £{-past_week:.2f} ({change})"
+    return f"Week: £{-past_week:.2f} ({change})", percent_change
 
 
 class YNABModule(NeedsInternetModule):
@@ -133,12 +134,12 @@ class YNABModule(NeedsInternetModule):
             self.output = "No network!"
             self.raw_output = "No network!"
 
-    async def get_weekly_total(self) -> str | None:
+    async def get_weekly_total(self) -> tuple[str | None, int | None]:
         """Get weekly totals from YNAB API and format as string."""
         try:
             df = await asyncio.to_thread(get_transactions)
         except:  # noqa: E722
-            return None
+            return None, None
 
         return format_output(df)
 
@@ -146,12 +147,23 @@ class YNABModule(NeedsInternetModule):
         self.output = "Updating..."
         await self.request_redraw()
 
-        result = await self.get_weekly_total()
+        result, percent_change = await self.get_weekly_total()
 
         if result is None:
             self.output = "No network!"
         else:
             self.output = result
             self.raw_output = self.output
+            if self.coloriser is not None:
+                if percent_change is not None and percent_change > 0:
+                    self.output = self.coloriser(
+                        self.output,
+                        fg=CONFIG.ynab.positive_percent_color,
+                    )
+                else:
+                    self.output = self.coloriser(
+                        self.output,
+                        fg=CONFIG.ynab.negative_percent_color,
+                    )
 
         await self.request_redraw()

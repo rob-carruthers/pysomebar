@@ -63,3 +63,5 @@ device = "k10temp"
 interval = 7200
 access_token = ""
 plan_id = ""
+negative_percent_color = "green_d"
+positive_percent_color = "red_d"
