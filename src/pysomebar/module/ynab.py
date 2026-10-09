@@ -96,9 +96,9 @@ def format_output(df: pl.DataFrame) -> str:
     if week_before == 0:
         change = "N/A"
     else:
-        percent_change = (abs(past_week) / abs(week_before) - 1) * 100
+        percent_change = round((abs(past_week) / abs(week_before) - 1) * 100)
         sign = "+" if percent_change > 0 else ""
-        change = f"{sign}{percent_change:.2f}%"
+        change = f"{sign}{percent_change}%"
 
     return f"Week: £{-past_week:.2f} ({change})"
 
