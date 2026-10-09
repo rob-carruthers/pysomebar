@@ -7,12 +7,12 @@ from typing import TYPE_CHECKING, Literal
 
 import serial_asyncio
 
-from pysomebar.module import Module, MPDModule, PacmanModule, PulseModule, PortageModule
+from pysomebar.module import Module, MPDModule, PacmanModule, PortageModule, PulseModule
 
 if TYPE_CHECKING:
     from pysomebar.module.mpd import MPDPlayerState
 
-PicoStatusInputDataType = Literal["time", "mpd", "pacman", "pulse"]
+PicoStatusInputDataType = Literal["time", "mpd", "updates", "pulse"]
 
 
 class PicoStatusUpdater:
@@ -115,7 +115,7 @@ class PicoStatusUpdater:
         return {
             "time": {"text": now},
             "mpd": {"text": mpd_now_playing, "state": state, "dur": dur, "pos": pos},
-            "pacman": {"text": updates},
+            "updates": {"text": updates},
             "pulse": {"text": current_volume, "is_headset": is_headset},
         }
 
