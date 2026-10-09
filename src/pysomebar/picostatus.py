@@ -7,12 +7,12 @@ from typing import TYPE_CHECKING, Literal
 
 import serial_asyncio
 
-from pysomebar.module import Module, MPDModule, PacmanModule, PortageModule, PulseModule
+from pysomebar.module import Module, MPDModule, PacmanModule, PortageModule, PulseModule, YNABModule
 
 if TYPE_CHECKING:
     from pysomebar.module.mpd import MPDPlayerState
 
-PicoStatusInputDataType = Literal["time", "mpd", "updates", "pulse"]
+PicoStatusInputDataType = Literal["time", "mpd", "updates", "pulse", "ynab"]
 
 
 class PicoStatusUpdater:
@@ -82,6 +82,14 @@ class PicoStatusUpdater:
 
         return portage_module.raw_output
 
+    def get_ynab_data(self) -> str | None:
+        """Retrieve latest YNAB data from running YNABModule."""
+        ynab_module = self.modules.get("ynab")
+        if not isinstance(ynab_module, YNABModule):
+            return None
+
+        return ynab_module.raw_output
+
     def get_pulse_data(self) -> tuple[str, bool]:
         """Retrieve latest PulseAudio data from running PulseModule."""
         pulse_module = self.modules.get("pulse")
@@ -102,6 +110,7 @@ class PicoStatusUpdater:
         mpd_now_playing, state, pos, dur = self.get_mpd_data()
         pacman_updates = self.get_pacman_data()
         portage_updates = self.get_portage_data()
+        ynab_data = self.get_ynab_data() or "N/A"
         current_volume, is_headset = self.get_pulse_data()
         now = self.get_current_time()
 
@@ -117,6 +126,7 @@ class PicoStatusUpdater:
             "mpd": {"text": mpd_now_playing, "state": state, "dur": dur, "pos": pos},
             "updates": {"text": updates},
             "pulse": {"text": current_volume, "is_headset": is_headset},
+            "ynab": {"text": ynab_data},
         }
 
     async def main_loop(self) -> None:
