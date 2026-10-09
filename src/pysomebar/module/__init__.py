@@ -12,6 +12,7 @@ from .pacman import PacmanModule
 from .portage import PortageModule
 from .pulse import PulseModule
 from .temp import TempModule
+from .ynab import YNABModule
 
 __all__ = [
     "BatteryModule",
@@ -26,4 +27,5 @@ __all__ = [
     "PortageModule",
     "PulseModule",
     "TempModule",
+    "YNABModule",
 ]

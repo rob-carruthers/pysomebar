@@ -7,12 +7,14 @@ requires-python = ">=3.14"
 dependencies = [
   "aiofiles",
   "asyncinotify",
+  "polars>=2.0.0",
   "psutil",
   "pulsectl-asyncio",
   "pydantic",
   "pyserial-asyncio",
   "python-mpd2",
   "xdg-base-dirs",
+  "ynab>=4.4.0",
 ]
 
 [project.scripts]

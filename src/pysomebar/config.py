@@ -149,6 +149,13 @@ class TempModuleConfig(ModuleConfig):
     red_threshold: int = 75
 
 
+class YNABModuleConfig(ModuleConfig):
+    """Config for YNAB module."""
+
+    access_token: str | None = None
+    plan_id: str | None = None
+
+
 class Config(BaseModel):
     """Top-level config."""
 
@@ -172,6 +179,7 @@ class Config(BaseModel):
     pacman: PacmanModuleConfig = PacmanModuleConfig()
     portage: PortageModuleConfig = PortageModuleConfig()
     temp: TempModuleConfig = TempModuleConfig()
+    ynab: YNABModuleConfig = YNABModuleConfig()
 
 
 try:

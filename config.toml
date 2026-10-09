@@ -58,3 +58,8 @@ port = 6600
 [temp]
 interval = 5
 device = "k10temp"
+
+[ynab]
+interval = 7200
+access_token = ""
+plan_id = ""
