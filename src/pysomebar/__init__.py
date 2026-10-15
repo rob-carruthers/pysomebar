@@ -68,28 +68,31 @@ async def instantiate_modules(updater: Updater) -> None:
         await updater.add_module(module_cls(updater.coloriser))
 
 
-async def main_loop() -> None:
-    """Start main async loop."""
-    # Set an event handler for SIGPIPE if using piped stdout - shutdown if the pipe is destroyed
-    loop = asyncio.get_running_loop()
-    stop_event = asyncio.Event()
-    loop.add_signal_handler(signal.SIGPIPE, stop_event.set)
+def create_updater() -> Updater:
+    """Instantiate the relevant updater based on config."""
     picostatus = CONFIG.picostatus
 
     match CONFIG.bar_type:
         case "somebar":
-            updater = SomebarUpdater(picostatus=picostatus)
+            return SomebarUpdater(picostatus=picostatus)
         case "dwlb":
-            updater = PipeOutputUpdater(picostatus=picostatus, coloriser=make_dwlb_colored_text)
+            return PipeOutputUpdater(picostatus=picostatus, coloriser=make_dwlb_colored_text)
         case "waybar":
-            updater = PipeOutputUpdater(picostatus=picostatus, coloriser=make_pango_colored_text)
+            return PipeOutputUpdater(picostatus=picostatus, coloriser=make_pango_colored_text)
         case "polybar":
-            updater = PipeOutputUpdater(picostatus=picostatus, coloriser=make_polybar_colored_text)
+            return PipeOutputUpdater(picostatus=picostatus, coloriser=make_polybar_colored_text)
         case _:
             msg = f"bar_type `{CONFIG.bar_type}` unsupported."
             raise ValueError(msg)
 
-    await instantiate_modules(updater)
+
+def register_signal_handlers(
+    loop: asyncio.AbstractEventLoop,
+    updater: Updater,
+    stop_event: asyncio.Event,
+) -> None:
+    """Register process signal handlers."""
+    loop.add_signal_handler(signal.SIGPIPE, stop_event.set)
 
     signal_groups: dict[int, list[Module]] = {}
     for module in updater.modules.values():
@@ -104,20 +107,30 @@ async def main_loop() -> None:
 
         loop.add_signal_handler(signal.SIGRTMIN + offset, handle_refresh)
 
+
+async def main_loop() -> None:
+    """Start main async loop."""
+    loop = asyncio.get_running_loop()
+    stop_event = asyncio.Event()
+
+    updater = create_updater()
+    await instantiate_modules(updater)
+    register_signal_handlers(loop, updater, stop_event)
+
     await updater.initial_update()
-    updater_task = asyncio.create_task(updater.loop())
+
+    tasks: list[asyncio.Task[None]] = [asyncio.create_task(updater.loop()), *updater.tasks]
+
     if updater.picostatus:
-        picostatus_task = asyncio.create_task(updater.picostatus.run())
+        tasks.append(asyncio.create_task(updater.picostatus.run()))
 
-    await stop_event.wait()
+    try:
+        await stop_event.wait()
+    finally:
+        for task in tasks:
+            task.cancel()
 
-    updater_task.cancel()
-    if updater.picostatus:
-        picostatus_task.cancel()
-
-    for task in updater.tasks:
-        task.cancel()
-    await asyncio.gather(updater_task, *updater.tasks, return_exceptions=True)
+        await asyncio.gather(*tasks, return_exceptions=True)
 
 
 def main() -> None:  # noqa: D103
