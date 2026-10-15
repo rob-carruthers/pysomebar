@@ -44,7 +44,7 @@ class Updater(ABC):
 
         self.picostatus = PicoStatusUpdater(modules=self.modules) if picostatus else None
 
-    async def add_module(self, module: Module) -> None:
+    def add_module(self, module: Module) -> None:
         """Add a module to this updater."""
         module.updater = self
         self.tasks.add(asyncio.create_task(module.loop()))

@@ -45,7 +45,7 @@ def _all_concrete_subclasses(cls: type[Module]) -> set[type[Module]]:
     return result
 
 
-async def instantiate_modules(updater: Updater) -> None:
+def instantiate_modules(updater: Updater) -> None:
     """Instantiate modules in `updater` using ordered list from config."""
     available_modules: dict[str, type[Module]] = {}
     for module_cls in _all_concrete_subclasses(Module):
@@ -65,7 +65,7 @@ async def instantiate_modules(updater: Updater) -> None:
             msg = f"Module `{module_name}` unrecognised."
             raise ValueError(msg)
         module_cls = available_modules[module_name]
-        await updater.add_module(module_cls(updater.coloriser))
+        updater.add_module(module_cls(updater.coloriser))
 
 
 def create_updater() -> Updater:
@@ -114,7 +114,7 @@ async def main_loop() -> None:
     stop_event = asyncio.Event()
 
     updater = create_updater()
-    await instantiate_modules(updater)
+    instantiate_modules(updater)
     register_signal_handlers(loop, updater, stop_event)
 
     await updater.initial_update()
