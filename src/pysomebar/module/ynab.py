@@ -15,6 +15,18 @@ if TYPE_CHECKING:
     from pysomebar.util import ColoriserProtocol
 
 
+def transactions_filter(df: pl.DataFrame) -> pl.DataFrame:
+    """Filter any retrieved transactions.
+
+    List of filters:
+      - Exclude filters in 'Inflow: Ready to Assign' since this is income and not spending.
+      - Exclude deleted transactions.
+    """
+    excluded_categories = ("Inflow: Ready to Assign",)
+
+    return df.filter(~pl.col("category_name").is_in(excluded_categories) & ~pl.col("deleted"))
+
+
 def get_transactions() -> pl.DataFrame:
     """Retrieve transactions for the past two weeks from the YNAB API."""
     access_token = CONFIG.ynab.access_token
@@ -68,7 +80,7 @@ def get_transactions() -> pl.DataFrame:
         "category_name",
         "deleted",
         "amount_currency",
-    ).filter(~pl.col("deleted"))
+    ).pipe(transactions_filter)
 
 
 def get_period_total(
