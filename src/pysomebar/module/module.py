@@ -40,6 +40,7 @@ class Module(ABC):
         self.refresh_event.set()
 
     async def request_redraw(self) -> None:
+        """Request a redraw of this module."""
         if self.updater is not None:
             await self.updater.update_queue.put(self)
 
