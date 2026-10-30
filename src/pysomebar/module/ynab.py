@@ -1,7 +1,7 @@
 """YNAB metrics."""
 
 import asyncio
-import datetime
+import datetime as dt
 from typing import TYPE_CHECKING
 
 import polars as pl
@@ -22,7 +22,7 @@ def transactions_filter(df: pl.DataFrame) -> pl.DataFrame:
       - Exclude filters in 'Inflow: Ready to Assign' since this is income and not spending.
       - Exclude deleted transactions.
     """
-    excluded_categories = ("Inflow: Ready to Assign",)
+    excluded_categories = ("Inflow: Ready to Assign", "Joint Account (1st)")
 
     return df.filter(~pl.col("category_name").is_in(excluded_categories) & ~pl.col("deleted"))
 
@@ -39,9 +39,9 @@ def get_transactions() -> pl.DataFrame:
         msg = "YNAB plan ID not provided."
         raise ValueError(msg)
 
-    today = datetime.datetime.now().astimezone().date()
-    start_of_week = today - datetime.timedelta(days=today.weekday())
-    since_date = start_of_week - datetime.timedelta(weeks=1)
+    today = dt.datetime.now().astimezone().date()
+    start_of_week = today - dt.timedelta(days=today.weekday())
+    since_date = start_of_week - dt.timedelta(weeks=1)
 
     config = ynab.Configuration(access_token=access_token)
 
@@ -90,10 +90,10 @@ def get_period_total(
     amount_col: str = "amount_currency",
 ) -> float:
     """Get sum of transactions from the start of the week to equivalent day this week."""
-    today = datetime.datetime.now().astimezone().date()
-    start_of_week = today - datetime.timedelta(days=today.weekday())
-    start = start_of_week - datetime.timedelta(weeks=weeks_ago)
-    end = start + datetime.timedelta(days=(today - start_of_week).days + 1)
+    today = dt.datetime.now().astimezone().date()
+    start_of_week = today - dt.timedelta(days=today.weekday())
+    start = start_of_week - dt.timedelta(weeks=weeks_ago)
+    end = start + dt.timedelta(days=(today - start_of_week).days + 1)
 
     amount = df.filter(pl.col(date_col).is_between(start, end, closed="left"))[amount_col].sum()
 

@@ -1,7 +1,7 @@
 """Updater for picostatus."""
 
 import asyncio
-import datetime
+import datetime as dt
 import json
 from typing import TYPE_CHECKING, Literal
 
@@ -102,7 +102,7 @@ class PicoStatusUpdater:
 
     def get_current_time(self, fmt: str = "%H:%M:%S") -> str:
         """Get the current time as string."""
-        now = datetime.datetime.now(tz=datetime.UTC).astimezone()
+        now = dt.datetime.now(tz=dt.UTC).astimezone()
         return now.strftime(fmt)
 
     def format_status(self) -> dict[PicoStatusInputDataType, dict[str, str | int]]:
@@ -140,7 +140,7 @@ class PicoStatusUpdater:
             await self.writer.drain()
             self.last_write = asyncio.get_running_loop().time()
 
-            now = datetime.datetime.now(tz=datetime.UTC).timestamp()
+            now = dt.datetime.now(tz=dt.UTC).timestamp()
             next_tick = (now // self.interval_secs + 1) * self.interval_secs
             timeout = next_tick - now
 

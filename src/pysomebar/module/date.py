@@ -1,6 +1,6 @@
 """Date module for pysomebar."""
 
-import datetime
+import datetime as dt
 from typing import TYPE_CHECKING
 
 from pysomebar.config import CONFIG
@@ -24,7 +24,7 @@ class DateModule(Module):
 
     async def update(self) -> None:
         """Update output with current date/time in chosen format."""
-        now = datetime.datetime.now().astimezone()
+        now = dt.datetime.now().astimezone()
         self.output = now.strftime(CONFIG.date.format)
 
         # Sync refresh to zeroth second, regardless of our chosen interval
